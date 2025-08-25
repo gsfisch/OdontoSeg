@@ -1,0 +1,11 @@
+,orig_path,marc_path,problema,maior_512x512,maior_256x256
+0,./data_resized/originais/carcinomas/47.png,./data_resized/masks/carcinomas/47.png,carcinoma,True,True
+1,./data_resized/originais/carcinomas/52.png,./data_resized/masks/carcinomas/52.png,carcinoma,True,True
+2,./data_resized/originais/carcinomas/43.png,./data_resized/masks/carcinomas/43.png,carcinoma,True,True
+3,./data_resized/originais/leucoplasias/42.png,./data_resized/masks/leucoplasias/42.png,leucoplasia,True,True
+4,./data_resized/originais/leucoplasias/11.png,./data_resized/masks/leucoplasias/11.png,leucoplasia,True,True
+5,./data_resized/originais/leucoplasias/32.png,./data_resized/masks/leucoplasias/32.png,leucoplasia,True,True
+6,./data_resized/originais/leucoplasias/21.png,./data_resized/masks/leucoplasias/21.png,leucoplasia,True,True
+7,./data_resized/originais/leucoplasias/58.png,./data_resized/masks/leucoplasias/58.png,leucoplasia,True,True
+8,./data_resized/originais/carcinomas/81.png,./data_resized/masks/carcinomas/81.png,carcinoma,True,True
+9,./data_resized/originais/leucoplasias/15.png,./data_resized/masks/leucoplasias/15.png,leucoplasia,True,True
