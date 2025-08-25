@@ -1,0 +1,11 @@
+,orig_path,marc_path,problema
+0,./data_images/evaluation/originais/carc_48.png,./data_images/evaluation/gt/carc_48.png,carcinoma
+1,./data_images/evaluation/originais/carc_75.png,./data_images/evaluation/gt/carc_75.png,carcinoma
+2,./data_images/evaluation/originais/carc_aug19.png,./data_images/evaluation/gt/carc_aug19.png,carcinoma
+3,./data_images/evaluation/originais/carc_aug42.png,./data_images/evaluation/gt/carc_aug42.png,carcinoma
+4,./data_images/evaluation/originais/carc_aug45.png,./data_images/evaluation/gt/carc_aug45.png,carcinoma
+5,./data_images/evaluation/originais/leu_36.png,./data_images/evaluation/gt/leu_36.png,leucoplasia
+6,./data_images/evaluation/originais/leu_46.png,./data_images/evaluation/gt/leu_46.png,leucoplasia
+7,./data_images/evaluation/originais/leu_aug44.png,./data_images/evaluation/gt/leu_aug44.png,leucoplasia
+8,./data_images/evaluation/originais/leu_aug48.png,./data_images/evaluation/gt/leu_aug48.png,leucoplasia
+9,./data_images/evaluation/originais/leu_aug53.png,./data_images/evaluation/gt/leu_aug53.png,leucoplasia

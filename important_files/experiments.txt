@@ -1,0 +1,153 @@
+default optmizer = optim.Adam(model.parameters(), lr=1e-4)
+default batch_size = 2
+
+experimento_1 = Unet (512 -> 512) - Data aug: ElasticTransform, GridDistortion, OpticalDistortion,  HorizontalFlip, VerticalFlip, RandomRotate90, Transpose, 
+RandomBrightnessContrast,  RandomGamma
+experimento_2 = Unet (512 -> 512) - Data aug: HorizontalFlip, VerticalFlip, RandomRotate90, Transpose, RandomBrightnessContrast,  RandomGamma
+experimento_3 = Unet (512 -> 512 com BN) - Data aug: 
+experimento_4 = Unet + Vgg + Drop Conv Layer / Enconder (512 -> 512) - Data aug: HorizontalFlip,VerticalFlip,RandomRotate90,Transpose,RandomBrightnessContrast, RandomGamma
+experimento_5 = Unet + Vgg (512 -> 512) - Data aug: HorizontalFlip,VerticalFlip,RandomRotate90,Transpose,RandomBrightnessContrast, RandomGamma
+experimento_6 = Unet + Vgg + Drop Conv Layer / Enconder + Decoder (512 -> 512) - Data aug: HorizontalFlip,VerticalFlip,RandomRotate90,Transpose,RandomBrightnessContrast, RandomGamma
+experimento_7 = Unet + Vgg + Drop (0.5) Conv Layer / Enconder + Decoder (512 -> 512) - Data aug: HorizontalFlip,VerticalFlip,RandomRotate90,Transpose,RandomBrightnessContrast, RandomGamma
+experimento_8 = Unet + Vgg + Drop (0.2) Conv Layer / Enconder + Decoder (512 -> 512) - Data aug: HorizontalFlip,VerticalFlip,RandomRotate90,Transpose,RandomBrightnessContrast, RandomGamma
+experimento_9 = Unet + Vgg16 (512 -> 512) - Data aug: HorizontalFlip,VerticalFlip,RandomRotate90,Transpose,RandomBrightnessContrast, RandomGamma
+experimento_10 = Unet + Vgg16 (512 -> 512) / Using dice + ce - Data aug: HorizontalFlip,VerticalFlip,RandomRotate90,Transpose,RandomBrightnessContrast, RandomGamma
+experimento_11 = Unet + Vgg16 (512 -> 512) / Using dice + ce ( without weighted ) - Data aug: HorizontalFlip,VerticalFlip,RandomRotate90,Transpose,
+RandomBrightnessContrast, RandomGamma
+experimento_12 = Unet + Vgg16 (512 -> 512) / Using dice + ce ( without weighted ) -
+ - only looking for val_acc -  Data aug: HorizontalFlip, VerticalFlip, RandomRotate90, Transpose, RandomBrightnessContrast, 
+RandomGamma
+experimento_13 = Unet + Vgg11 (512 -> 512) + Drop Conv Layer / Enconder Using ce + softmax - Data aug: HorizontalFlip,VerticalFlip,RandomRotate90,Transpose,RandomBrightnessContrast, RandomGamma
+experimento_14 = Unet + Vgg11 (512 -> 512) + Drop Conv Layer / Enconder Using j1 + weighted - Data aug: HorizontalFlip,VerticalFlip,RandomRotate90,Transpose,RandomBrightnessContrast, RandomGamma
+experimento_15 = Unet + Vgg11 (512 -> 512) + Drop Conv Layer / Enconder Using j1 + weighted  + 10-fold cros validation (90 - 10. letting 5 folds without training)
+- Data aug: HorizontalFlip,VerticalFlip,RandomRotate90,Transpose,RandomBrightnessContrast, RandomGamma
+experimento_16 = Unet + Vgg11 (512 -> 512) + Drop Conv Layer / Enconder Using j1 + weighted + 10-fold cros validation
+- Data aug: HorizontalFlip,VerticalFlip,RandomRotate90,Transpose,RandomBrightnessContrast, RandomGamma
+experimento_17 = Unet + Vgg11 (512 -> 512) + Drop Conv Layer / Enconder Using j1 + weighted + 10-fold cros validation
+- Data aug: HorizontalFlip,VerticalFlip,RandomRotate90,Transpose,RandomBrightnessContrast, RandomGamma
+experimento_18 = Unet + Vgg11 (512 -> 512) + Drop Conv Layer / Enconder Using j1 + weighted + 10-fold cros validation + choosing best val_loss last fold
+- Data aug: HorizontalFlip,VerticalFlip,RandomRotate90,Transpose,RandomBrightnessContrast, RandomGamma
+experimento_19 = Unet + Vgg11 (512 -> 512) + Drop Conv Layer / Enconder Using j1 + weighted + 10-fold cros validation + choosing best val_loss
+- Data aug: HorizontalFlip,VerticalFlip,RandomRotate90,Transpose,RandomBrightnessContrast, RandomGamma
+experimento_19 = Unet + Vgg11 (512 -> 512) + Drop Conv Layer / Enconder Using focal loss
+- Data aug: HorizontalFlip,VerticalFlip,RandomRotate90,Transpose,RandomBrightnessContrast, RandomGamma
+experimento_20 = Unet + albunet (512 -> 512) + Using focal loss
+- Data aug: HorizontalFlip,VerticalFlip,RandomRotate90,Transpose,RandomBrightnessContrast, RandomGamma + 
+  OneOf([ElasticTransform(p=0.5, alpha=120, sigma=120 * 0.05, alpha_affine=120 * 0.03), GridDistortion(p=0.5), OpticalDistortion(p=1, distort_limit=2, shift_limit=0.5)], p=0.8),
+experimento_21 = Unet + vgg16 (512 -> 512) + Using focal loss(y=2, alfa=1)
+- Data aug: HorizontalFlip,VerticalFlip,RandomRotate90,Transpose,RandomBrightnessContrast, RandomGamma, 
+  OneOf([ElasticTransform(p=0.5, alpha=120, sigma=120 * 0.05, alpha_affine=120 * 0.03), GridDistortion(p=0.5), OpticalDistortion(p=1, distort_limit=2, shift_limit=0.5)], p=0.8),
+experimento_22 = Unet + Vgg16 (512 -> 512) + Using focal loss(y=2, alfa=1) + adam (lr=1e-4, weight_decay=1e-2)
+- Data aug: HorizontalFlip,VerticalFlip,RandomRotate90,Transpose,RandomBrightnessContrast, RandomGamma, 
+  OneOf([ElasticTransform(p=0.5, alpha=120, sigma=120 * 0.05, alpha_affine=120 * 0.03), GridDistortion(p=0.5), OpticalDistortion(p=1, distort_limit=2, shift_limit=0.5)], p=0.8),
+experimento_23 = Unet + Vgg16 (512 -> 512) + Drop Conv Layer / Encoder(0.1) + Decoder(0.1)  + Using focal loss(y=2, alfa=1) + adam (lr=1e-4, weight_decay=1e-2)
+- Data aug: HorizontalFlip, VerticalFlip, RandomRotate90, Transpose, RandomBrightnessContrast, RandomGamma, 
+  OneOf([ElasticTransform(p=0.5, alpha=120, sigma=120 * 0.05, alpha_affine=120 * 0.03), GridDistortion(p=0.5), OpticalDistortion(p=1, distort_limit=2, shift_limit=0.5)], p=0.8),
+
+experimento_24 = Unet + Vgg16 (512 -> 512) + is_deconv=True + Decoder(0.1)  + Using focal loss(y=2, alfa=1) + adam (lr=1e-4, weight_decay=1e-2) + batch_size=8
+- Data aug: HorizontalFlip, VerticalFlip, RandomRotate90, Transpose, RandomBrightnessContrast, RandomGamma, 
+  OneOf([ElasticTransform(p=0.5, alpha=120, sigma=120 * 0.05, alpha_affine=120 * 0.03), GridDistortion(p=0.5), OpticalDistortion(p=1, distort_limit=2, shift_limit=0.5)], p=0.8),
+  RandomCrop(352, 480	),
+  
+experimento_25 = Unet + EfficientNetB5 (512 -> 512) + 
+  1) Train using weighted CE until model val_acc > 0.92 + optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-1)
+  2) Train 250 epochs Using focal loss(y=2, alfa=1) + optim.SGD(model.parameters(), lr=1e-2, momentum=0.9, nesterov=True, weight_decay=1e-4)
+
+- Data aug: 
+  HorizontalFlip, VerticalFlip, RandomRotate90, Transpose, RandomBrightnessContrast, RandomGamma, 
+  OneOf([ElasticTransform(p=0.5, alpha=120, sigma=120 * 0.05, alpha_affine=120 * 0.03), GridDistortion(p=0.5), OpticalDistortion(p=1, distort_limit=2, shift_limit=0.5)], p=0.8),
+  ShiftScaleRotate(p=0.5)
+
+experimento_26 = PSPNet + EfficientNetB5 (512 -> 512)  
+  1) Train with 10-fold cross valdiation, 200 epochs for each fold. I didn't reset the model after each fold
+  2) Used Ranger(model.parameters(), weight_decay=1e-2)
+  3) Used OneCycleLr from pytorch 1.13. I reset the scheduler before each folder run ( need to train without reseting)
+     - scheduler = lr_scheduler.OneCycleLR(opt, 1e-3, epochs=200)
+  4) This time I tried a lot of augmentations ( need to check strategies related to auto augmentations)
+
+- Data aug: HorizontalFlip(p=0.5),VerticalFlip(p=0.5), RandomRotate90(p=0.5), Transpose(p=0.5), Solarize(p=0.5), ISONoise(p=0.5), Equalize(p=0.5), Posterize(p=0.5),
+  OneOf([ElasticTransform(p=0.5, alpha=120, sigma=120 * 0.05, alpha_affine=120 * 0.03), GridDistortion(p=0.5), OpticalDistortion(p=1, distort_limit=2, shift_limit=0.5)                  
+  ], p=0.8), RandomContrast(p=0.5), RandomBrightnessContrast(p=0.5), RandomGamma(p=0.5), ShiftScaleRotate(p=0.5), GaussNoise(p=0.5),Blur(p=0.5)
+
+experimento_27 = PSPNet + EfficientNetB5 (512 -> 512)  
+  1) Train 500 epochs with focal loss(y=4, alfa=1) + optmizer(option='ranger', model=model, lr=1e-3, weight_decay=1e-4)
+  2) Train with batch 4 (using batch acumulator)
+
+- Data aug: HorizontalFlip(p=0.5), VerticalFlip(p=0.5), RandomRotate90(p=0.5), Transpose(p=0.5), Equalize(p=0.5), Posterize(p=0.5),
+  OneOf([ElasticTransform(p=0.5, alpha=120, sigma=120 * 0.05, alpha_affine=120 * 0.03),GridDistortion(p=0.5), OpticalDistortion(p=1, distort_limit=2, shift_limit=0.5)], p=0.8),
+  RandomContrast(p=0.5), RandomBrightness(p=0.5), RandomGamma(p=0.5), RandomResizedCrop(512, 512, p=0.5)
+
+experimento_28 = FPN + EfficientNetB5 (512 -> 512)  
+  ** Excluding noise images (from now one these images are deleted)
+  1) Train 500 epochs with focal loss(y=4, alfa=1) + optmizer(option='ranger', model=model, lr=1e-3, weight_decay=1e-4)
+  2) Train with batch 4 (using batch acumulator)
+
+- Data aug: HorizontalFlip(p=0.5), VerticalFlip(p=0.5), RandomRotate90(p=0.5), Transpose(p=0.5), Equalize(p=0.5), Posterize(p=0.5),
+  OneOf([ElasticTransform(p=0.5, alpha=120, sigma=120 * 0.05, alpha_affine=120 * 0.03),GridDistortion(p=0.5), OpticalDistortion(p=1, distort_limit=2, shift_limit=0.5)], p=0.8),
+  RandomContrast(p=0.5), RandomBrightness(p=0.5), RandomGamma(p=0.5), RandomResizedCrop(512, 512, p=0.5)
+
+experimento_29 = FPN + EfficientNetB5 (512 -> 512)  
+  1) Train 40 epochs with jaccard loss + optmizer(option='sgd', model=model, lr=1e-2, weight_decay=1e-4, momentum=0.9, nesterov=True)
+  2) load model 28
+  3) Train with batch 4 (using batch acumulator)
+  4) remove RandomResizedCrop, ElasticTransform and Posterize aug
+
+- Data aug: HorizontalFlip(p=0.5), VerticalFlip(p=0.5), RandomRotate90(p=0.5), Transpose(p=0.5), Equalize(p=0.5),
+  RandomContrast(p=0.5), RandomBrightness(p=0.5), RandomGamma(p=0.5)
+
+experimento_30 = FPN + EfficientNetB5 (512 -> 512)  
+  1) Train 200 epochs with Generalized dice loss + optmizer(option='rangerlars', model=model, lr=1e-3, weight_decay=1e-4)
+  2) load model 28
+  3) Train with batch 4 (using batch acumulator)
+  4) remove RandomResizedCrop, ElasticTransform
+
+- Data aug: HorizontalFlip(p=0.5), VerticalFlip(p=0.5), RandomRotate90(p=0.5), Transpose(p=0.5), Equalize(p=0.5), Posterize(p=0.5),
+  RandomContrast(p=0.5), RandomBrightness(p=0.5), RandomGamma(p=0.5)
+
+experimento_31 = FPN + EfficientNetB5 (512 -> 512)  
+  1) Train 300 epochs with Generalized dice loss plus surface loss + optmizer(option='rangerlars', model=model, lr=1e-3, weight_decay=1e-4)
+  2) load model 28
+  3) Train with batch 4 (using batch acumulator)
+  4) remove RandomResizedCrop, ElasticTransform
+
+- Data aug: HorizontalFlip(p=0.5), VerticalFlip(p=0.5), RandomRotate90(p=0.5), Transpose(p=0.5), Equalize(p=0.5), Posterize(p=0.5),
+  RandomContrast(p=0.5), RandomBrightness(p=0.5), RandomGamma(p=0.5)
+
+experimento_32 = FPN + EfficientNetB5 (512 -> 512)  
+  1) Train 89 epochs + optmizer(option='rangerlars', model=model, lr=1e-3, weight_decay=1e-4)
+  2) load model 28
+  3) Train with batch 12 (using batch acumulator)
+  4) remove RandomResizedCrop, ElasticTransform
+  5) Used FlatplusAnneal(opt, max_iter=300, step_size=0.7)
+  6) Used mish instead of Relu
+  7) Used FocalLoss(alpha=1)(outputs.clone(), masks.clone()) + GD(idc=[0,1,2])(F.softmax(outputs.clone(), dim=1), masks.clone(), None)
+      - Focal loss has gamma = 2
+      - Focal loss and GD has missing class ignored
+
+- Data aug: HorizontalFlip(p=0.5), VerticalFlip(p=0.5), RandomRotate90(p=0.5), Transpose(p=0.5), Equalize(p=0.5), Posterize(p=0.5),
+  RandomContrast(p=0.5), RandomBrightness(p=0.5), RandomGamma(p=0.5)
+
+experimento_33 = FPN + EfficientNetB6 (512 -> 512)  
+  ** Excluding noise images (from now one these images are deleted)
+  1) Train 500 epochs with focal loss(y=4, alfa=1) + optmizer(option='rangerlars', model=model, lr=1e-3, weight_decay=1e-2)
+  2) Train with batch 12 (using batch acumulator)
+  3) Dropout 0.5
+  4) Using swish in EfficientNetB6
+
+- Data aug: HorizontalFlip(p=0.5), VerticalFlip(p=0.5), RandomRotate90(p=0.5), Transpose(p=0.5), Equalize(p=0.5), Posterize(p=0.5),
+  OneOf([ElasticTransform(p=0.5, alpha=120, sigma=120 * 0.05, alpha_affine=120 * 0.03), GridDistortion(p=0.5), OpticalDistortion(p=1, distort_limit=2, shift_limit=0.5)], p=0.8),
+  RandomContrast(p=0.5), RandomBrightness(p=0.5), RandomGamma(p=0.5), GaussianBlur(p=0.5), RandomResizedCrop(512, 512, p=0.5), ShiftScaleRotate(p=0.5, scale_limit=0, border_mode=cv2.BORDER_CONSTANT)
+
+experimento_34 = FPN + EfficientNetB5 (512 -> 512)  
+  ** Excluding noise images (from now one these images are deleted)
+  1) Train 300 epochs with focal loss(y=4, alfa=1) + optmizer(option='radam', model=model, lr=1e-3, weight_decay=1e-2)
+  2) Train using FlatplusAnneal
+  4) Using swish in EfficientNetB5
+  5) Apex option 2 with keep_batchnorm_fp32=True, loss_scale=1.0
+  6) Batch size 6, with batch acumulator 18
+
+- Data aug: HorizontalFlip(p=0.5),VerticalFlip(p=0.5), RandomRotate90(p=0.5), Transpose(p=0.5), Equalize(p=0.5), Posterize(p=0.5),
+    OneOf([ElasticTransform(p=0.5, alpha=120, sigma=120 * 0.05, alpha_affine=120 * 0.03), GridDistortion(p=0.5),OpticalDistortion(p=0.5, distort_limit=2, shift_limit=0.5)], p=0.8),
+    RandomContrast(p=0.5), RandomBrightness(p=0.5), RandomGamma(p=0.5), FancyPCA(p=0.5), ChannelDropout(p=0.5), HueSaturationValue(p=0.5), CLAHE(p=0.5),
+    ShiftScaleRotate(p=0.5, scale_limit=0, border_mode=cv2.BORDER_CONSTANT),
+    Normalize(p=1.0)

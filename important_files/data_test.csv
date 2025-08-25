@@ -1,0 +1,11 @@
+orig_path,marc_path,problema,maior_512x512,maior_256x256
+./data/originais/leucoplasias/11.JPG,./data/marcações/leucoplasias/11.JPG,leucoplasia,True,True
+./data/originais/carcinomas/81.jpg,./data/marcações/carcinomas/81.jpg,carcinoma,True,True
+./data/originais/carcinomas/47.JPG,./data/marcações/carcinomas/47.JPG,carcinoma,True,True
+./data/originais/leucoplasias/58.jpg,./data/marcações/leucoplasias/58.jpg,leucoplasia,True,True
+./data/originais/leucoplasias/21.JPG,./data/marcações/leucoplasias/21.JPG,leucoplasia,True,True
+./data/originais/leucoplasias/32.JPG,./data/marcações/leucoplasias/32.JPG,leucoplasia,True,True
+./data/originais/carcinomas/43.JPG,./data/marcações/carcinomas/43.JPG,carcinoma,True,True
+./data/originais/carcinomas/52.jpg,./data/marcações/carcinomas/52.jpg,carcinoma,True,True
+./data/originais/leucoplasias/42.JPG,./data/marcações/leucoplasias/42.JPG,leucoplasia,True,True
+./data/originais/leucoplasias/15.JPG,./data/marcações/leucoplasias/15.JPG,leucoplasia,True,True
