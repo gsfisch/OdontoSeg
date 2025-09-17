@@ -1,16 +1,16 @@
 import os
 import torch
 
-wandb_name = 'odonto_segmentation_4_reviewed'
+wandb_name = '3'
 
 training_config = {
-  'experiment_name': 'unet_resnet34',
+  'experiment_name': 'Transformer',
   'encoder' : 'resnet34',
   'architecture': 'U-Net',
-  'epochs': 1000,
-  'batch_size': 8,
-  'val_batch_size': 8,
-  'dataset_path' : '/home/gioam/SSD/right_experiment/dataset/',
+  'epochs': 2,
+  'batch_size': 2,
+  'val_batch_size': 2,
+  'dataset_path' : '/home/master/Documents/TCC/odonto_segmentation/dataset',
   'loss_function' : 'dice',
   'optimizer': 'rangerlars',
   'learning_rate': 1e-3, # 1e-5 e 1e-1
@@ -19,9 +19,9 @@ training_config = {
   'class_weigths': [0.6471186223837316, 1.0, 2.613295558781593, 0.03166476775283598] # calculated by the inverse of pixels frequency
 }
 
-path_models = '/home/gioam/SSD/right_experiment/models/'
-path_save_evaluation = '/home/gioam/SSD/right_experiment/comparison/'
-path_save_evaluation_percentage = '/home/gioam/SSD/right_experiment/comparison-percentage/'
+path_models = '/home/master/Documents/TCC/odonto_segmentation/models/'
+path_save_evaluation = '/home/master/Documents/TCC/odonto_segmentation/experiments/comparison/'
+path_save_evaluation_percentage = '/home/master/Documents/TCC/odonto_segmentation/experiments/comparison-percentage/'
 save_percentage = True
 
 classes_color = [
