@@ -18,6 +18,13 @@ class UNET_Dataset(Dataset):
         self.mask_files = [imread(path) for path in mask_filenames]
         self.augment = augmentator
 
+        #print(image_filenames[:2], end="\n")
+        #print(mask_filenames[:2], end="\n")
+
+        #for path in image_filenames:
+        #    if path in mask_filenames:
+        #        self.image_files =
+
     def __getitem__(self, index):
         """
         Generates one sample of data.

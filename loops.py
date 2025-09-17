@@ -1,4 +1,5 @@
 import torch
+import time
 from tqdm import tqdm
 from util.new_metrics import calculate_accuracy, calculate_mean_iou, calculate_precision_recall, calculate_dice_coefficient, calculate_weighted_accuracy, calculate_weighted_miou
 from loss.main import criterion
@@ -41,6 +42,7 @@ def train_loop(generator, optimizer, model):
     loop = tqdm(enumerate(generator), total=total_batches, desc='Training')
 
     for batch_idx, (images, masks) in loop:
+        torch.cuda.empty_cache()
         images = images.permute(0, 3, 1, 2).cuda()
         masks = masks.long().cuda()
         
@@ -50,6 +52,7 @@ def train_loop(generator, optimizer, model):
         loss = criterion(option=loss_function, outputs=outputs, masks=masks)
         loss.backward()
         optimizer.step()
+        time.sleep(2)
         
         # Compute and accumulate metrics
         metrics = compute_metrics(outputs, masks)

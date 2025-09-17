@@ -25,7 +25,7 @@ def load_images_from_folder(folder: str) -> Tuple[List[str], List[str]]:
         raise FileNotFoundError(f"Directories {images_path} or {masks_path} do not exist.")
 
     for file in os.listdir(images_path):
-        if file.endswith(".png"):
+        if file.endswith(".png") and file in os.listdir(masks_path):
             image_file = os.path.join(images_path, file)
             mask_file = os.path.join(masks_path, file)
 

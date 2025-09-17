@@ -59,5 +59,18 @@ def make_model(
             classes=classes,
             encoder_weights="imagenet",
         )
+
+    elif arch == "SegFormer":
+        model = smp.SegFormer(
+            encoder_name = "resnet34",
+            encoder_depth = 5,
+            encoder_weights = None, #"imagenet"
+            decoder_segmentation_channels = 256,
+            in_channels = 3,
+            classes = classes,
+            activation = None,
+            upsampling = 4,
+            aux_params = None,
+        )
         
     return model
