@@ -7,6 +7,7 @@ from optimizers.main import optimizer
 from config import training_config, path_models
 from util.scheduler import FlatplusAnneal
 import wandb
+#from models.swinv2_small_window8_256.model_src import SegmentationModel
 
 def load_model(model_path):
     """
@@ -55,15 +56,24 @@ def test_routine(folder_experiment:str, best_epoch_training: int, wand_logged:bo
     
     test_generator = get_test_generator()
 
-    experiments = [os.path.join(folder_experiment, f) for f in os.listdir(folder_experiment) if os.path.isfile(os.path.join(folder_experiment, f))]
+    #experiments = [os.path.join(folder_experiment, f) for f in os.listdir(folder_experiment) if os.path.isfile(os.path.join(folder_experiment, f))]
+    experiments = os.listdir(folder_experiment)
+    experiments.remove('model_src.py')
+    experiments = sorted(experiments)
+    print(experiments)
+
     metrics = []
     for index, experiment in enumerate(experiments):
-        if not os.path.isfile(experiment):
+        if not os.path.isfile(f'{folder_experiment}/{experiment}'):
             print(f"File not found: {experiment}")
             continue
         
         try:
-            model = load_model(experiment)
+            # model = load_model(experiment)
+            # model = torch.load(f'{folder_experiment}/{experiment_name}_epoch_{num_files}.pth').cuda()
+            model = SegmentationModel().cuda()
+            #model = torch.load(f'{folder_experiment}/{experiment}').cuda()
+            model.load_state_dict(torch.load(f'{folder_experiment}/{experiment}', weights_only=True))
             current_metrics = evaluate_model(model, test_generator)
             if wand_logged:
                 print('LOGANDO')
@@ -94,12 +104,12 @@ def test_routine(folder_experiment:str, best_epoch_training: int, wand_logged:bo
     save_best_models(best_metrics, folder_experiment)
     
     # Delete files that are not the best models
-    for experiment in experiments:
-        if best_epoch_training == experiment:
-            continue  # Do not delete the best epoch's model
-        os.remove(experiment)
+    #for experiment in experiments:
+    #    if best_epoch_training == experiment:
+    #        continue  # Do not delete the best epoch's model
+    #    os.remove(experiment)
     
 if __name__ == "__main__":
-    folder_experiment = "unet_vgg19_focal_loss_20240905-154617"
+    folder_experiment = training_config['experiment_name']
     experiment_path = os.path.join(path_models, folder_experiment)
     test_routine(experiment_path, 499)

@@ -32,5 +32,7 @@ def optimizer(option='radam', model=None, lr=1e-5, weight_decay=0):
         return RangerLars(model.parameters(), lr=lr, weight_decay=weight_decay)
     elif (option == 'novograd'):
         return Novograd(model.parameters(), lr=lr, weight_decay=weight_decay)
+    elif (option == 'adamw'):
+        return optim.AdamW(model.parameters(), lr=lr, weight_decay=weight_decay)
     else:
         raise NameError("Option is invalid. Got {}".format(option))

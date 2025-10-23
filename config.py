@@ -1,22 +1,48 @@
 import os
 import torch
 
-wandb_name = '3'
+# ['resnet18', 'resnet34', 'resnet50', 'resnet101', 'resnet152', 'resnext50_32x4d', 'resnext101_32x4d', 'resnext101_32x8d', 
+# 'resnext101_32x16d', 'resnext101_32x32d', 'resnext101_32x48d', 'dpn68', 'dpn68b', 'dpn92', 'dpn98', 'dpn107', 'dpn131',
+#  'vgg11', 'vgg11_bn', 'vgg13', 'vgg13_bn', 'vgg16', 'vgg16_bn', 'vgg19', 'vgg19_bn',
+#  'senet154', 'se_resnet50', 'se_resnet101', 'se_resnet152', 'se_resnext50_32x4d', 'se_resnext101_32x4d', 
+# 'densenet121', 'densenet169', 'densenet201', 'densenet161', 'inceptionresnetv2', 'inceptionv4', 'efficientnet-b0', 'efficientnet-b1', 'efficientnet-b2', 
+# 'efficientnet-b3', 'efficientnet-b4', 'efficientnet-b5', 'efficientnet-b6', 'efficientnet-b7', 'mobilenet_v2', 'xception', 
+# 'timm-efficientnet-b0', 'timm-efficientnet-b1', 'timm-efficientnet-b2', 'timm-efficientnet-b3', 'timm-efficientnet-b4', 
+# 'timm-efficientnet-b5', 'timm-efficientnet-b6', 'timm-efficientnet-b7', 'timm-efficientnet-b8', 'timm-efficientnet-l2', 
+# 'timm-tf_efficientnet_lite0', 'timm-tf_efficientnet_lite1', 'timm-tf_efficientnet_lite2', 'timm-tf_efficientnet_lite3', 
+# 'timm-tf_efficientnet_lite4', 'timm-skresnet18', 'timm-skresnet34', 'timm-skresnext50_32x4d', 
+# 'mit_b0', 'mit_b1', 'mit_b2', 'mit_b3', 'mit_b4', 'mit_b5', 'mobileone_s0', 'mobileone_s1', 'mobileone_s2', 'mobileone_s3', 'mobileone_s4']
+wandb_name = 'Transformers'
 
 training_config = {
-  'experiment_name': 'Transformer',
-  'encoder' : 'resnet34',
+  'experiment_name': 'vit_tiny_patch16_224__U-Net',
+  'encoder' : 'vit_tiny_patch16_224',
   'architecture': 'U-Net',
-  'epochs': 2,
-  'batch_size': 2,
-  'val_batch_size': 2,
+  'epochs': 50,
+  'batch_size': 4,
+  'val_batch_size': 4,
+  'delay_per_batch': 5,
   'dataset_path' : '/home/master/Documents/TCC/odonto_segmentation/dataset',
   'loss_function' : 'dice',
-  'optimizer': 'rangerlars',
-  'learning_rate': 1e-3, # 1e-5 e 1e-1
+  'optimizer': 'adamw',
+  'scheduler_step_size': 0.8,
+  'learning_rate': 1e-4, # 1e-5 e 1e-1 0.001
   'weight_decay' : 1e-4, # 
   'classes': 4,
-  'class_weigths': [0.6471186223837316, 1.0, 2.613295558781593, 0.03166476775283598] # calculated by the inverse of pixels frequency
+  'class_weigths': [0.6471186223837316, 1.0, 2.613295558781593, 0.03166476775283598], # calculated by the inverse of pixels frequency
+  
+  
+  
+  'library': 'torchseg', # smp and torchseg for now
+  'encoder_depth': 4,
+  'decoder_channels': (256, 128, 64, 32),
+  'encoder_params': {
+                'img_size': 512,
+                #"scale_factors": (16, 8, 4, 2),
+                "scale_factors": (8, 4, 2, 1),
+                #"scale_factors": (4, 2, 1, 0.5),
+            },
+  'head_upsampling': 2,
 }
 
 path_models = '/home/master/Documents/TCC/odonto_segmentation/models/'

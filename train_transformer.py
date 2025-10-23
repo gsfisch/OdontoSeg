@@ -10,30 +10,52 @@ import wandb
 from datetime import datetime
 from config import training_config, wandb_config, wandb_name, path_models
 from util.scheduler import FlatplusAnneal, FlatplusAnnealTeste
-from transformer_model import arch
+#from transformer_model import SegmentationModel
+from model_src import SegmentationModel
+from torchinfo import summary
+import torchseg
 
 def train():
     torch.cuda.empty_cache()
     #torch.cuda.reset_peak_memory_stats()
     experiment_name = training_config['experiment_name']
-    num_epochs = 2
+    num_epochs = training_config['epochs']
     #num_epochs = training_config['epochs'] - num_files
     
     # create experiment folder
     folder_experiment = os.path.join(path_models, f"{experiment_name}")
     os.makedirs(folder_experiment, exist_ok=True)
-    num_files = len([f for f in os.listdir(folder_experiment) if os.path.isfile(os.path.join(folder_experiment, f))])
+    num_files = len([f for f in os.listdir(folder_experiment) if os.path.isfile(os.path.join(folder_experiment, f)) and f != 'model_src.py'])
     initial_epoch = num_files + 1
     print(f'Total files: {num_files}')
 
     # initialize model
-    #model = make_model(training_config['encoder'], training_config['architecture'], classes=training_config['classes']).cuda()
-    if num_files == 0:
-        model = arch.cuda()
-        print("New model created")
-    else:
-        model = torch.load(f'{folder_experiment}/{experiment_name}_epoch_{num_files}.pth').cuda()
-        print(f"Model '{experiment_name}_epoch_{num_files}' loaded")
+    model = make_model(training_config['encoder'], training_config['architecture'], 
+                       classes=training_config['classes'], library=training_config['library'],
+                       decoder_channels=training_config['decoder_channels'], encoder_depth=training_config['encoder_depth'],
+                       encoder_params=training_config['encoder_params'], head_upsampling=training_config['head_upsampling']).cuda()
+
+    #for param in model.encoder.parameters():
+    #    param.requires_grad = False
+
+
+    summary(model, input_size=(training_config['batch_size'], 3, 512, 512))
+
+    #model = SegmentationModel().cuda()
+    #if num_files == 0:
+    #    model.load_state_dict(torch.load(f'/home/master/Documents/TCC/odonto_segmentation/models/swinv2_Dense_adamw/swinv2_Dense_adamw_epoch_13.pth', weights_only=True))
+        # Fine tuning of the encoder
+        #for name, param in model.encoder.named_parameters():
+            #print(f'Name: {name}')
+        #    if 'layers_3.blocks.1' in name or 'layers_3.blocks.0' in name:
+        #        param.requires_grad = True
+
+    #    print("New model created.")
+    #else:
+        # model = torch.load(f'{folder_experiment}/{experiment_name}_epoch_{num_files}.pth').cuda()
+    #    model.load_state_dict(torch.load(f'{folder_experiment}/{experiment_name}_epoch_{num_files}.pth', weights_only=True))
+
+    #    print(f"Model '{experiment_name}_epoch_{num_files}' loaded.")
     
     # get data generators
     training_generator, valid_generator = get_data_generators()
@@ -45,7 +67,8 @@ def train():
         lr=training_config['learning_rate'],
         weight_decay=training_config['weight_decay']
     )
-    scheduler = FlatplusAnneal(opt, max_iter=300, step_size=0.7)
+    # scheduler = FlatplusAnneal(opt, max_iter=300, step_size=0.7)
+    scheduler = FlatplusAnneal(opt, max_iter=training_config['epochs'], step_size=training_config['scheduler_step_size'])
     
     # Initialize WandB
     wandb.init(
@@ -55,9 +78,8 @@ def train():
     )
     
     best_model_loss = float('inf')
+    best_model_dice = float('-inf')
     best_epoch = num_files
-
-    num_epochs
     
     for epoch in range(initial_epoch, initial_epoch + num_epochs):
         # Train
@@ -71,22 +93,32 @@ def train():
         
         # Save model checkpoint
         # model_path = os.path.join(folder_experiment, f'{training_config["experiment_name"]}-{epoch}.pt')
-        model_path = os.path.join(folder_experiment, f'{experiment_name}_epoch_{epoch}.pth')        
+        #model_path = os.path.join(folder_experiment, f'{experiment_name}_epoch_{epoch}.pth')        
         #torch.save(model.state_dict(), model_path)
-        torch.save(model, model_path)
-        print(f"Model '{model_path}' saved")
+        #torch.save(model, model_path)
+        #print(f"Model '{model_path}' saved.")
         current_lr = opt.param_groups[0]['lr']
 
         # Update best model if needed
-        if metrics_train['loss'] < best_model_loss:
-            best_model_loss = metrics_train['loss']
-            best_epoch = epoch
+        #if metrics_train['loss'] < best_model_loss:
+        #    best_model_loss = metrics_train['loss']
+        #    best_epoch = epoch
                 
+
         # Print and log results
         print(f'\nEpoch {epoch}/{initial_epoch + num_epochs - 1}, '
               f'train_loss: {metrics_train["loss"]:.3f}, val_loss: {metrics_val["loss"]:.3f}, '
               f'train_acc: {metrics_train["accuracy"]:.3f}, val_acc: {metrics_val["accuracy"]:.3f}, '
-              f'train_mIoU: {metrics_train["mIoU"]:.3f}, val_mIoU: {metrics_val["mIoU"]:.3f}\n')
+              f'train_mIoU: {metrics_train["mIoU"]:.3f}, val_mIoU: {metrics_val["mIoU"]:.3f}\n ',
+              f'train_dice: {metrics_train["dice"]:.3f}, val_dice: {metrics_val["dice"]:.3f}\n'
+              )
+              
+        # Check best checkpoint based on Validation Dice
+        if metrics_val['dice'] > best_model_dice:
+            best_model_dice = metrics_val['dice']
+            model_path = os.path.join(folder_experiment, f'{experiment_name}.pth')
+            torch.save(model.state_dict(), model_path)
+            print(f"Saving Checkpoint at epoch: {epoch}")
         
         metrics_wandb = logging_wandb(metrics_train, metrics_val)
         
@@ -101,9 +133,9 @@ def train():
     print(f'Best epoch: {best_epoch}')
 
     # Finish WandB logging
-    wandb.finish()
+    #wandb.finish()
 
-    return
+    #return
     
      # Run test routine
     test_routine(folder_experiment, best_epoch, wand_logged=True)
@@ -129,4 +161,3 @@ def logging_wandb(metrics_train, metrics_validation):
 
 if __name__ == "__main__":
     train()
-    

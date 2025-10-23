@@ -9,6 +9,7 @@ segmentation_models_pytorch/__pycache__/
 experiments
 test
 test_wrong_results_with_data_aug
+models
 
 segmentation_models_pytorch/base/__pycache__/
 segmentation_models_pytorch/encoders/__pycache__/
