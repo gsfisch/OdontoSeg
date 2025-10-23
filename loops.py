@@ -29,9 +29,9 @@ def train_loop(generator, optimizer, model):
         "loss": 0.0,
         "accuracy": 0.0,
         "mIoU": 0.0,
+        "dice": 0.0,
         "precision": 0.0,
         "recall": 0.0,
-        "dice": 0.0,
         "weighted_accuracy": 0.0,
         "weighted_mIoU": 0.0
     }
@@ -52,7 +52,7 @@ def train_loop(generator, optimizer, model):
         loss = criterion(option=loss_function, outputs=outputs, masks=masks)
         loss.backward()
         optimizer.step()
-        time.sleep(2)
+        time.sleep(training_config['delay_per_batch'])
         
         # Compute and accumulate metrics
         metrics = compute_metrics(outputs, masks)
@@ -78,9 +78,9 @@ def val_loop(generator, model):
         "loss": 0.0,
         "accuracy": 0.0,
         "mIoU": 0.0,
+        "dice": 0.0,
         "precision": 0.0,
         "recall": 0.0,
-        "dice": 0.0,
         "weighted_accuracy": 0.0,
         "weighted_mIoU": 0.0
     }
@@ -96,6 +96,7 @@ def val_loop(generator, model):
             images = images.permute(0, 3, 1, 2).cuda()
             outputs = model(images)
             loss = criterion(option=loss_function, outputs=outputs.clone(), masks=masks.clone())
+            time.sleep(training_config['delay_per_batch'])
 
             # Compute and accumulate metrics
             metrics = compute_metrics(outputs, masks)
@@ -138,6 +139,7 @@ def test_loop(generator, model):
             images = images.permute(0, 3, 1, 2).cuda()
             outputs = model(images)
             loss = criterion(option=loss_function, outputs=outputs.clone(), masks=masks.clone())
+            time.sleep(training_config['delay_per_batch'])
 
             # Compute and accumulate metrics
             metrics = compute_metrics(outputs, masks)

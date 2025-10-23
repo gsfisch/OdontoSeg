@@ -18,24 +18,51 @@ import torch.nn.functional as F
 class SegmentationModel(nn.Module):
     def __init__(self):
         super().__init__()
-        self.backbone = timm.create_model('swin_base_patch4_window12_384', pretrained=True, features_only=True)
-        self.classifier = nn.Conv2d(1024, 4, 1)
+        self.encoder = timm.create_model('swinv2_small_window8_256', pretrained=True, features_only=True)
+        for param in self.encoder.parameters():
+            param.requires_grad = False
+            
+        self.decoder = nn.Sequential(
+            nn.ConvTranspose2d(768, 512, kernel_size=2, stride=2), # 16
+            nn.BatchNorm2d(512),
+            nn.ReLU(inplace=True),
+
+            nn.ConvTranspose2d(512, 256, kernel_size=2, stride=2), # 32
+            nn.BatchNorm2d(256),
+            nn.ReLU(inplace=True),
+
+            nn.ConvTranspose2d(256, 128, kernel_size=2, stride=2), # 64
+            nn.BatchNorm2d(128),
+            nn.ReLU(inplace=True),
+
+            nn.ConvTranspose2d(128, 64, kernel_size=2, stride=2), # 128
+            nn.BatchNorm2d(64),
+            nn.ReLU(inplace=True),
+
+            nn.ConvTranspose2d(64, 32, kernel_size=2, stride=2), # 256
+            nn.BatchNorm2d(32),
+            nn.ReLU(inplace=True),
+
+            nn.ConvTranspose2d(32, 16, kernel_size=2, stride=2), # 512
+            nn.BatchNorm2d(16),
+            nn.ReLU(inplace=True),
+        )
+        self.classifier = nn.Conv2d(16, 4, 1)
         
         
     def forward(self, x):
-        # Resize input to backbone resolution
-        x = F.interpolate(x, size=(384, 384), mode='bilinear', align_corners=False)
+        # Resize input to encoder resolution
+        x = F.interpolate(x, size=(256, 256), mode='bilinear', align_corners=False)
 
         # Extract features
-        features = self.backbone(x)[-1]
+        features = self.encoder(x)[-1]
+
+        # Decode features
+        decoded_features = self.decoder(features.permute(0, 3, 1, 2))
 
         # Pixel wise classification
-        output = self.classifier(features.permute(0, 3, 1, 2))
+        output = self.classifier(decoded_features)
 
         # Resize output to initial resolution
-        output = F.interpolate(output, size=(512, 512), mode='bilinear', align_corners=False)
+        #output = F.interpolate(output, size=(512, 512), mode='bilinear', align_corners=False)
         return output        
-
-
-
-arch = SegmentationModel()
