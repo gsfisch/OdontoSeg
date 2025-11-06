@@ -2,6 +2,23 @@ from typing import Optional
 import segmentation_models_pytorch as smp
 import torch
 import torchseg
+import torch.nn as nn
+import torch.nn.functional as F
+
+
+class Wrapper(nn.Module):
+    def __init__(self, model):
+        super().__init__()
+
+        self.model = model
+    
+    def forward(self, x):
+        y = self.model(x)
+        y = F.interpolate(y, size=(512, 512), mode='bilinear', align_corners=False)
+
+        return y
+
+
 
 def make_model(
     encoder: str,
@@ -13,6 +30,8 @@ def make_model(
     encoder_params={},
     head_upsampling=2,
     ) -> torch.nn.Module:
+
+    used_wrapper = False
 
     if library == 'smp': 
         if arch == "U-Net":
@@ -77,7 +96,7 @@ def make_model(
             decoder_channels=decoder_channels,
             encoder_depth=encoder_depth,
             encoder_params=encoder_params,
-            #head_upsampling=head_upsampling,
+            head_upsampling=head_upsampling,
             )
 
         elif arch == 'U-Net++':
@@ -91,6 +110,9 @@ def make_model(
                 encoder_params=encoder_params,
             )
 
+            model = Wrapper(model)
+            used_wrapper = True
+
         elif arch == 'MAnet':
             model = torchseg.MAnet(
                 encoder_name=encoder,
@@ -101,6 +123,9 @@ def make_model(
                 encoder_depth=encoder_depth,
                 encoder_params=encoder_params,
             )
+
+            model = Wrapper(model)
+            used_wrapper = True
 
         elif arch == 'Linknet':
             model = torchseg.Linknet(
@@ -164,9 +189,15 @@ def make_model(
         else:
             print("Architecture not implemented")
 
-            
-    for param in model.encoder.parameters():
-        param.requires_grad = False
+    
+    # Freeze encoder
+    if used_wrapper:
+        for param in model.model.encoder.parameters():
+            param.requires_grad = False
+
+    else:
+        for param in model.encoder.parameters():
+            param.requires_grad = False
         
     return model
 

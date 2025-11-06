@@ -12,22 +12,22 @@ import torch
 # 'timm-tf_efficientnet_lite0', 'timm-tf_efficientnet_lite1', 'timm-tf_efficientnet_lite2', 'timm-tf_efficientnet_lite3', 
 # 'timm-tf_efficientnet_lite4', 'timm-skresnet18', 'timm-skresnet34', 'timm-skresnext50_32x4d', 
 # 'mit_b0', 'mit_b1', 'mit_b2', 'mit_b3', 'mit_b4', 'mit_b5', 'mobileone_s0', 'mobileone_s1', 'mobileone_s2', 'mobileone_s3', 'mobileone_s4']
-wandb_name = 'Transformers'
+wandb_name = 'OdontoSeg'
 
 training_config = {
-  'experiment_name': 'vit_tiny_patch16_224__U-Net',
-  'encoder' : 'vit_tiny_patch16_224',
-  'architecture': 'U-Net',
-  'epochs': 50,
-  'batch_size': 4,
-  'val_batch_size': 4,
+  'experiment_name': 'swin_base_patch4_window12_384_U-Net++',
+  'encoder' : 'swin_base_patch4_window12_384',
+  'architecture': 'U-Net++',
+  'epochs': 200,
+  'batch_size': 32,
+  'val_batch_size': 32,
   'delay_per_batch': 5,
-  'dataset_path' : '/home/master/Documents/TCC/odonto_segmentation/dataset',
+  'dataset_path' : '/home/fisch/Documents/OdontoSeg/dataset',
   'loss_function' : 'dice',
   'optimizer': 'adamw',
   'scheduler_step_size': 0.8,
-  'learning_rate': 1e-4, # 1e-5 e 1e-1 0.001
-  'weight_decay' : 1e-4, # 
+  'learning_rate': 1e-4,
+  'weight_decay' : 1e-4,
   'classes': 4,
   'class_weigths': [0.6471186223837316, 1.0, 2.613295558781593, 0.03166476775283598], # calculated by the inverse of pixels frequency
   
@@ -38,16 +38,14 @@ training_config = {
   'decoder_channels': (256, 128, 64, 32),
   'encoder_params': {
                 'img_size': 512,
-                #"scale_factors": (16, 8, 4, 2),
                 "scale_factors": (8, 4, 2, 1),
-                #"scale_factors": (4, 2, 1, 0.5),
             },
   'head_upsampling': 2,
 }
 
-path_models = '/home/master/Documents/TCC/odonto_segmentation/models/'
-path_save_evaluation = '/home/master/Documents/TCC/odonto_segmentation/experiments/comparison/'
-path_save_evaluation_percentage = '/home/master/Documents/TCC/odonto_segmentation/experiments/comparison-percentage/'
+path_models = '/home/fisch/Documents/OdontoSeg/models/'
+path_save_evaluation = '/home/fisch/Documents/OdontoSeg/experiments/comparison/'
+path_save_evaluation_percentage = '/home/fisch/Documents/OdontoSeg/experiments/comparison-percentage/'
 save_percentage = True
 
 classes_color = [

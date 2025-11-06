@@ -14,6 +14,41 @@ from util.scheduler import FlatplusAnneal, FlatplusAnnealTeste
 from model_src import SegmentationModel
 from torchinfo import summary
 import torchseg
+# + "'" + training_config[''] + "',\n"  +
+
+def make_configs_file():
+    pass
+    '''
+    with open('config_test_file.txt', 'w') as config_file:
+        config_file.write(
+            "training_config = {\n" +
+            "'experiment_name': " + "'" + training_config['experiment_name'] + "',\n"  +
+            "'encoder': "  + "'" + training_config[''] + "',\n"  +
+            "'architecture': "  + "'" + training_config[''] + "',\n"  +
+            "'epochs': "   + "'" + training_config[''] + "',\n"  +
+            "'batch_size': "  + "'" + training_config[''] + "',\n"  +
+            "'val_batch_size': "  + "'" + training_config[''] + "',\n"  +
+            "'delay_per_batch': "  + "'" + training_config[''] + "',\n"  +
+            "'dataset_path': "  + "'" + training_config[''] + "',\n"  +
+            "'loss_function': "  + "'" + training_config[''] + "',\n"  +
+            "'optimizer': "  + "'" + training_config[''] + "',\n"  +
+            "'scheduler_step_size': "  + "'" + training_config[''] + "',\n"  +
+            "'learning_rate': "  + "'" + training_config[''] + "',\n"  +
+            "'weight_decay': "  + "'" + training_config[''] + "',\n"  +
+            "'classes': "  + "'" + training_config[''] + "',\n"  +
+            "'class_weigths': [0.6471186223837316, 1.0, 2.613295558781593, 0.0316647677528359 +# calculated by the inverse of pixels frequency" +
+
+
+
+            "'library': " 'torchseg', # smp and torchseg for now  +
+            "'encoder_depth': " + 4,  +
+            "'decoder_channels': " + (256, 128, 64, 32),  +
+            "'encoder_params': " + "{{"   +
+                            "'img_size': " + 512,  +
+                            "'scale_factors': " + (8, 4, 2, 1),  +
+                        "}},"  +
+            "'head_upsampling': 2 }}" )
+'''
 
 def train():
     torch.cuda.empty_cache()
@@ -80,6 +115,9 @@ def train():
     best_model_loss = float('inf')
     best_model_dice = float('-inf')
     best_epoch = num_files
+
+    # Save configs file
+    make_configs_file()
     
     for epoch in range(initial_epoch, initial_epoch + num_epochs):
         # Train
