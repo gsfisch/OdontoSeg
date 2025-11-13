@@ -1,0 +1,28 @@
+training_config = {
+  'experiment_name': 'swinv2_small_window8_256_U-Net',
+  'encoder' : 'swinv2_small_window8_256',
+  'architecture': 'U-Net',
+  'epochs': 200,
+  'batch_size': 32,
+  'val_batch_size': 32,
+  'delay_per_batch': 5,
+  'dataset_path' : '/home/fisch/Documents/OdontoSeg/dataset',
+  'loss_function' : 'dice',
+  'optimizer': 'adamw',
+  'scheduler_step_size': 0.8,
+  'learning_rate': 1e-4,
+  'weight_decay' : 1e-4,
+  'classes': 4,
+  'class_weigths': [0.6471186223837316, 1.0, 2.613295558781593, 0.03166476775283598], # calculated by the inverse of pixels frequency
+  
+  
+  
+  'library': 'torchseg', # smp and torchseg for now
+  'encoder_depth': 4,
+  'decoder_channels': (256, 128, 64, 32),
+  'encoder_params': {
+                'img_size': 512,
+                "scale_factors": (8, 4, 2, 1),
+            },
+  'head_upsampling': 2,
+}
