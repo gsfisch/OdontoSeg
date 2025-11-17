@@ -14,8 +14,9 @@ from util.scheduler import FlatplusAnneal, FlatplusAnnealTeste
 from model_src import SegmentationModel
 from torchinfo import summary
 import torchseg
-from TransUNet.networks.vit_seg_modeling import VisionTransformer as ViT_seg
-from TransUNet.networks.vit_seg_modeling import CONFIGS as CONFIGS_ViT_seg
+#from TransUNet.networks.vit_seg_modeling import VisionTransformer
+#from TransUNet.networks.vit_seg_modeling import CONFIGS as CONFIGS_ViT_seg
+from TransUNet import UNetWithTransformer
 
 def make_configs_file():
     pass
@@ -71,17 +72,19 @@ def train():
     #                   decoder_channels=training_config['decoder_channels'], encoder_depth=training_config['encoder_depth'],
     #                   encoder_params=training_config['encoder_params'], head_upsampling=training_config['head_upsampling']).cuda()
 
-    config_vit = CONFIGS_ViT_seg['ViT-B_16']
-    config_vit.n_classes = 4
-    config_vit.n_skip = 16
+    #config_vit = CONFIGS_ViT_seg['R50-ViT-B_16']
+    #config_vit.n_classes = 4
+    #config_vit.n_skip = 16
     
-    model = ViT_seg(config_vit, img_size=512, num_classes=4).cuda()
+    #model = VisionTransformer(config_vit, img_size=512, num_classes=4).cuda()
 
-    for param in model.encoder.parameters():
-        param.requires_grad = False
+    model = UNetWithTransformer(4).cuda()
+
+    #for param in model.encoder.parameters():
+    #    param.requires_grad = False
 
 
-    summary(model, input_size=(training_config['batch_size'], 3, 512, 512))
+    #summary(model, input_size=(training_config['batch_size'], 3, 512, 512))
 
     #model = SegmentationModel().cuda()
     #if num_files == 0:
