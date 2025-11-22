@@ -36,11 +36,27 @@ class DownSampling(nn.Module):
 
 
 class Encoder(nn.Module):
-    def __init__(self, in_channels=3, in_height=512, in_width=512, first_stage_channels=32):
+    def __init__(self, in_channels=3, in_height=512, in_width=512, encoder_channels=[96, 192, 384, 576, 1152]):
         assert in_height % 16 == 0 and in_width % 16 == 0
 
         super().__init__()
 
+        self.conv_block_1 = ConvBlock(in_channels, encoder_channels[0])
+        self.down_sampling_1 = DownSampling(encoder_channels[0], encoder_channels[1])
+
+        self.conv_block_2 = ConvBlock(encoder_channels[1], encoder_channels[1])
+        self.down_sampling_2 = DownSampling(encoder_channels[1], encoder_channels[2])
+
+        self.conv_block_3 = ConvBlock(encoder_channels[2], encoder_channels[2])
+        self.down_sampling_3 = DownSampling(encoder_channels[2], encoder_channels[3])
+
+        self.conv_block_4 = ConvBlock(encoder_channels[3], encoder_channels[3])
+        self.down_sampling_4 = DownSampling(encoder_channels[3], encoder_channels[4])
+
+        self.conv_block_5 = ConvBlock(encoder_channels[4], encoder_channels[4])
+
+
+        '''
         self.conv_block_1 = ConvBlock(in_channels, first_stage_channels)
         self.down_sampling_1 = DownSampling(first_stage_channels, 2 * first_stage_channels)
 
@@ -54,6 +70,7 @@ class Encoder(nn.Module):
         self.down_sampling_4 = DownSampling(8 * first_stage_channels, 16 * first_stage_channels)
 
         self.conv_block_5 = ConvBlock(16 * first_stage_channels, 16 * first_stage_channels)
+        '''
 
 
     def forward(self, x):
@@ -80,7 +97,7 @@ if __name__ == "__main__":
 
     img = torch.rand(1, 3, 512, 512)
 
-    model = Encoder(in_channels=3, first_stage_channels=32)
+    model = Encoder(in_channels=3, first_stage_channels=96)
 
     x1, x2, x3, x4, bottleneck = model(img)
 

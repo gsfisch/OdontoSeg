@@ -15,12 +15,12 @@ import torch
 wandb_name = 'OdontoSeg'
 
 training_config = {
-  'experiment_name': 'TransUNet',
+  'experiment_name': 'MyArchitecture',
   'encoder' : '',
-  'architecture': 'TransUNet',
+  'architecture': 'MyArchitecture',
   'epochs': 200,
-  'batch_size': 4,
-  'val_batch_size': 4,
+  'batch_size': 8,
+  'val_batch_size': 8,
   'delay_per_batch': 5,
   'dataset_path' : '/home/fisch/Documents/OdontoSeg/dataset',
   'loss_function' : 'dice',
