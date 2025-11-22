@@ -4,6 +4,7 @@ import torch
 import torchseg
 import torch.nn as nn
 import torch.nn.functional as F
+from Architecture.MyArchitecture.MyArchitecture import MyArchitecture
 
 
 class Wrapper(nn.Module):
@@ -32,6 +33,16 @@ def make_model(
     ) -> torch.nn.Module:
 
     used_wrapper = False
+
+    if arch == 'MyArchitecture':
+        model = MyArchitecture()
+
+        for param in model.transformer.parameters():
+            param.requires_grad = False
+        
+        return model
+
+
 
     if library == 'smp': 
         if arch == "U-Net":

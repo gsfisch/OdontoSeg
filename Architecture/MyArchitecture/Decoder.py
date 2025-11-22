@@ -1,6 +1,7 @@
+import torch
 import torch.nn as nn
-from Encoder import ConvBlock
-
+from Architecture.MyArchitecture.Encoder import ConvBlock
+#from Encoder import ConvBlock
 
 class ConcatLayer(nn.Module):
     def __init__(self):
@@ -35,9 +36,32 @@ class UpSampling(nn.Module):
 
 
 class Decoder(nn.Module):
-    def __init__(self, in_channels):
+    def __init__(self, bottleneck_channels=1152, skip_channels=[96, 192, 384, 576], n_classes=4):
         super().__init__()
 
+        self.up_sampling_1 = UpSampling(bottleneck_channels, skip_channels[3])
+        self.concat_layer_1 = ConcatLayer()
+        self.conv_block_1 = ConvBlock(2 * skip_channels[3], skip_channels[3])
+
+
+        self.up_sampling_2 = UpSampling(skip_channels[3], skip_channels[2])
+        self.concat_layer_2 = ConcatLayer()
+        self.conv_block_2 = ConvBlock(2 * skip_channels[2], skip_channels[2])
+
+
+        self.up_sampling_3 = UpSampling(skip_channels[2], skip_channels[1])
+        self.concat_layer_3 = ConcatLayer()
+        self.conv_block_3 = ConvBlock(2 * skip_channels[1], skip_channels[1])
+
+
+        self.up_sampling_4 = UpSampling(skip_channels[1], skip_channels[0])
+        self.concat_layer_4 = ConcatLayer()
+        self.conv_block_4 = ConvBlock(2 * skip_channels[0], skip_channels[0])
+
+
+        self.seg_head = nn.Conv2d(skip_channels[0], n_classes, kernel_size=1)
+
+        '''
         self.up_sampling_1 = UpSampling(in_channels, in_channels // 2)
         self.concat_layer_1 = ConcatLayer()
         self.conv_block_1 = ConvBlock(in_channels, in_channels // 2)
@@ -58,15 +82,16 @@ class Decoder(nn.Module):
         self.conv_block_4 = ConvBlock(in_channels // 8, in_channels // 16)
 
 
-        self.seg_head = nn.Conv2d(in_channels // 16, 4, kernel_size=1)
+        self.seg_head = nn.Conv2d(in_channels // 16, n_classes, kernel_size=1)
+        '''
+
+
 
 
     def forward(self, x1, x2, x3, x4, bottleneck):
         x = self.up_sampling_1(bottleneck)
         x = self.concat_layer_1(x, x4)
         x = self.conv_block_1(x)
-
-        print(f'X after first stage: {x.shape}')
 
         x = self.up_sampling_2(x)
         x = self.concat_layer_2(x, x3)
@@ -89,13 +114,13 @@ class Decoder(nn.Module):
 if __name__ == "__main__":
     import torch
 
-    x1 = torch.rand(1, 32, 512, 512)
-    x2 = torch.rand(1, 64, 256, 256)
-    x3 = torch.rand(1, 128, 128, 128)
-    x4 = torch.rand(1, 256, 64, 64)
-    bottleneck = torch.rand(1, 512, 32, 32)
+    x1 = torch.rand(1, 96, 128, 128)
+    x2 = torch.rand(1, 192, 64, 64)
+    x3 = torch.rand(1, 384, 32, 32)
+    x4 = torch.rand(1, 576, 16, 16)
+    bottleneck = torch.rand(1, 1152, 16, 16)
 
-    model = Decoder(in_channels=512)
+    model = Decoder(bottleneck_channels=1152, skip_channels=[96, 192, 384, 576])
 
     logits = model(x1, x2, x3, x4, bottleneck)
 

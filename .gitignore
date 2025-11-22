@@ -10,6 +10,7 @@ experiments
 test
 test_wrong_results_with_data_aug
 Odonto_dataset_npz
+inference
 
 segmentation_models_pytorch/base/__pycache__/
 segmentation_models_pytorch/encoders/__pycache__/

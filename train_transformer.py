@@ -74,7 +74,7 @@ def train():
     #    param.requires_grad = False
 
 
-    summary(model, input_size=(training_config['batch_size'], 3, 512, 512))
+    #summary(model, input_size=(training_config['batch_size'], 3, 512, 512))
 
     #model = SegmentationModel().cuda()
     #if num_files == 0:
