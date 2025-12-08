@@ -10,7 +10,7 @@ from Architecture.MyArchitecture.Transformer import Transformer
 
 
 
-class MyArchitecture(nn.Module):
+class MyArchitecture_v2(nn.Module):
     def __init__(self):
         super().__init__()
 
@@ -50,12 +50,39 @@ class MyArchitecture(nn.Module):
         return logits
 
 
+'''
+class TransUNet(nn.Module):
+    def __init__(self):
+        super().__init__()
+
+        self.encoder = Encoder(in_channels=3, first_stage_channels=32)
+        self.transformer = Transformer()
+        self.decoder = Decoder(in_channels=512)
+
+
+    def forward(self, x):
+        x1, x2, x3, x4, bottleneck = self.encoder(x)
+        bottleneck = F.interpolate(bottleneck, size=(256, 256), mode='bilinear', align_corners=False)
+        
+        print(f'Bottleneck shape before transformer: {bottleneck.shape}')
+
+        bottleneck = self.transformer(bottleneck)
+
+        print(f'Bottleneck shape after transformer: {bottleneck.shape}')
+
+        logits = self.decoder(x1, x2, x3, x4, bottleneck)
+
+        return logits
+
+'''
+
+
 if __name__ == "__main__":
     import torch
 
     x = torch.rand(1, 3, 512, 512)
 
-    model = MyArchitecture()
+    model = MyArchitecture_v2()
 
     logits = model(x)
 

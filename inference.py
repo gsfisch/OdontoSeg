@@ -46,12 +46,12 @@ def mask_to_class(final_output):
 
 
 def main():
-    model_directory_path = "./models/swin_base_patch4_window7_224_U-Net++"  # Choose model
-    image_path = "./dataset/test/images/carcinoma_37.png"                   # Choose image
-    image_path = "./dataset/test/images/como-saber-cancer-de-boca-7-1024x576.webp"
+    model_directory_path = "models/MyArchitecture_pvt_v2_b1__U_Net"  # Choose model
+    #image_path = "./dataset/test/images/leucoplasia_N-103.png"                   # Choose image
+    image_path = "./dataset/test/images/ploliferativas_IMG_2088.png"                   # Choose image
     configs_file_name = "configs_used.txt"
-    model_file_name = model_directory_path[9:] + ".pth"
-    inference_directory_path = os.path.join("./inference/", model_directory_path[9:], datetime.now().strftime("%Y-%m-%d_%H:%M:%S.%f")[:-3])
+    model_file_name = model_directory_path[7:] + ".pth"
+    inference_directory_path = os.path.join("./inference/", model_directory_path[7:], datetime.now().strftime("%Y-%m-%d_%H:%M:%S.%f")[:-3])
 
 
     # Read training configurations

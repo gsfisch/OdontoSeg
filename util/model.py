@@ -5,6 +5,9 @@ import torchseg
 import torch.nn as nn
 import torch.nn.functional as F
 from Architecture.MyArchitecture.MyArchitecture import MyArchitecture
+from Architecture.MyArchitecture_v2.MyArchitecture_v2 import MyArchitecture_v2
+from Architecture.MyArchitecture_pvt_v2_b1__U_Net.MyArchitecture_pvt_v2_b1__U_Net import MyArchitecture_pvt_v2_b1__U_Net
+
 
 
 class Wrapper(nn.Module):
@@ -36,6 +39,22 @@ def make_model(
 
     if arch == 'MyArchitecture':
         model = MyArchitecture()
+
+        for param in model.transformer.parameters():
+            param.requires_grad = False
+        
+        return model
+
+    if arch == 'MyArchitecture_v2':
+        model = MyArchitecture_v2()
+
+        for param in model.transformer.parameters():
+            param.requires_grad = False
+        
+        return model
+
+    if arch == 'MyArchitecture_pvt_v2_b1__U_Net':
+        model = MyArchitecture_pvt_v2_b1__U_Net()
 
         for param in model.transformer.parameters():
             param.requires_grad = False
