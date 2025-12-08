@@ -1,22 +1,20 @@
 import torch.nn as nn
 import torch.nn.functional as F
-from Architecture.MyArchitecture.Encoder import Encoder
-from Architecture.MyArchitecture.Decoder import Decoder
-from Architecture.MyArchitecture.Transformer import Transformer
+from Architecture.MyArchitecture_pvt_v2_b1__U_Net.Encoder import Encoder
+from Architecture.MyArchitecture_pvt_v2_b1__U_Net.Decoder import Decoder
+from Architecture.MyArchitecture_pvt_v2_b1__U_Net.Transformer import Transformer
 #from Encoder import Encoder
 #from Decoder import Decoder
 #from Transformer import Transformer
 
 
-
-
-class MyArchitecture(nn.Module):
+class MyArchitecture_pvt_v2_b1__U_Net(nn.Module):
     def __init__(self):
         super().__init__()
 
-        self.encoder = Encoder(in_channels=3, encoder_channels=[96, 192, 384, 576, 1152])
+        self.encoder = Encoder(in_channels=3, encoder_channels=[64, 128, 320, 512, 1024])
         self.transformer = Transformer()
-        self.decoder = Decoder(bottleneck_channels=1152, skip_channels=[96, 192, 384, 576])
+        self.decoder = Decoder(bottleneck_channels=1024, skip_channels=[64, 128, 320, 512])
 
 
     def forward(self, x):
@@ -50,12 +48,14 @@ class MyArchitecture(nn.Module):
         return logits
 
 
+
+
 if __name__ == "__main__":
     import torch
 
     x = torch.rand(1, 3, 512, 512)
 
-    model = MyArchitecture()
+    model = MyArchitecture_pvt_v2_b1__U_Net()
 
     logits = model(x)
 
