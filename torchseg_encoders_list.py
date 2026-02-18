@@ -1,4 +1,4 @@
 import torchseg
 
-encoders = [x for x in torchseg.list_encoders() if 'swin' in x and 'base' in x]
+encoders = [x for x in torchseg.list_encoders()]
 print(encoders)
