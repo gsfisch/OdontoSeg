@@ -5,12 +5,12 @@ import torch
 wandb_name = 'OdontoSeg'
 
 training_config = {
-  'experiment_name': 'MyArchitecture_pvt_v2_b1__U_Net',
-  'encoder' : '',
-  'architecture': 'MyArchitecture_pvt_v2_b1__U_Net',
+  'experiment_name': 'vit_base_patch16_224_U-Net',
+  'encoder' : 'vit_base_patch16_224',
+  'architecture': 'U-Net',
   'epochs': 200,
-  'batch_size': 10,
-  'val_batch_size': 10,
+  'batch_size': 8,
+  'val_batch_size': 8, 
   'delay_per_batch': 5,
   'dataset_path' : '/home/fisch/Documents/OdontoSeg/dataset',
   'loss_function' : 'dice',
@@ -19,17 +19,19 @@ training_config = {
   'learning_rate': 1e-4,
   'weight_decay' : 1e-4,
   'classes': 4,
-  'class_weigths': [0.6471186223837316, 1.0, 2.613295558781593, 0.03166476775283598], # calculated by the inverse of pixels frequency
-
-  
-  'library': 'torchseg', # smp and torchseg for now
+  'class_weigths': 
+  [0.6471186223837316, 1.0, 2.613295558781593, 0.03166476775283598], # calculated by the inverse of pixels frequency
+  #'library': 'torchseg', # smp and torchseg for now
+  'library': 'torchseg',
   'encoder_depth': 4,
   'decoder_channels': (256, 128, 64, 32),
   'encoder_params': {
                 'img_size': 512,
                 "scale_factors": (8, 4, 2, 1),
+                #"scale_factors": (16, 8, 4, 2),
+                #"scale_factors": (4, 2, 1, 0.5),
             },
-  'head_upsampling': 2,
+  'head_upsampling': 1,
 }
 
 path_models = '/home/fisch/Documents/OdontoSeg/models/'

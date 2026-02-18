@@ -16,6 +16,8 @@ segmentation_models_pytorch/base/__pycache__/
 segmentation_models_pytorch/encoders/__pycache__/
 segmentation_models_pytorch/fpn/__pycache__/
 
+models
+
 *.png
 *.jpeg
 *.JPG
