@@ -1,2 +1,4 @@
 import torchseg
-print(torchseg.list_encoders())
+
+encoders = [x for x in torchseg.list_encoders()]
+print(encoders)

@@ -1,1 +1,0 @@
-path = '/home/gioam/projects/new-odonto-segmentation/experiments/'
