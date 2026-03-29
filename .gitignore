@@ -12,9 +12,17 @@ test_wrong_results_with_data_aug
 Odonto_dataset_npz
 inference
 
+other_datasets
+
 segmentation_models_pytorch/base/__pycache__/
 segmentation_models_pytorch/encoders/__pycache__/
 segmentation_models_pytorch/fpn/__pycache__/
+
+giovani_best-models.zip
+giovani_best-models/
+test_ds.py
+
+
 
 models
 

@@ -1,0 +1,63 @@
+import os
+os.environ['PYTORCH_CUDA_ALLOC_CONF'] = 'expandable_segments:True'
+import torch
+from util.data import get_data_generators
+from util.model import make_model
+from loops import val_loop
+from optimizers.main import optimizer
+import wandb
+from datetime import datetime
+from validation_config import validation_config
+#from util.scheduler import FlatplusAnneal, FlatplusAnnealTeste
+#from model_src import SegmentationModel
+from torchinfo import summary
+import torchseg
+import ast
+
+
+def validate():
+    torch.cuda.empty_cache()
+    #model_directory_path = 'models/swin_large_patch4_window7_224_U-Net'
+    #configs_file_name = 'config.txt'
+    #model_file_name = 'swin_large_patch4_window7_224_U-Net.pth'
+
+    model_directory_path = validation_config['model_directory_path']
+    configs_file_name = validation_config['configs_file_name']
+    model_file_name = validation_config['model_file_name']
+
+
+    # Read training configurations
+    training_config = {}
+    with open(os.path.join(model_directory_path, configs_file_name), 'r') as configs_file:
+        training_config = ast.literal_eval(configs_file.read())
+
+
+    # Initialize and load model
+    model = make_model(training_config['encoder'], training_config['architecture'], 
+        classes=training_config['classes'], library=training_config['library'],
+        decoder_channels=training_config['decoder_channels'], encoder_depth=training_config['encoder_depth'],
+        encoder_params=training_config['encoder_params'], head_upsampling=training_config['head_upsampling']).cuda()
+
+    model.load_state_dict(torch.load(os.path.join(model_directory_path, model_file_name), weights_only="True"))
+    summary(model, input_size=(validation_config['batch_size'], 3, 512, 512))
+
+    
+    # get data generators
+    training_generator, valid_generator = get_data_generators()
+
+
+    # Validate
+    metrics_val = val_loop(valid_generator, model)
+
+
+    # Print and log results
+    print(  f'val_loss: {metrics_val["loss"]:.3f}\n' +
+            f'val_acc: {metrics_val["accuracy"]:.3f}\n' +
+            f'val_mIoU: {metrics_val["mIoU"]:.3f}\n' +
+            f'val_dice: {metrics_val["dice"]:.3f}\n'
+        )
+
+
+
+if __name__ == "__main__":
+    validate()

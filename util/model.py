@@ -227,7 +227,7 @@ def make_model(
                 classes=classes,
                 decoder_channels=decoder_channels,
                 encoder_depth=encoder_depth,
-                #encoder_params=encoder_params,
+                encoder_params=encoder_params,
             )
 
             model = Wrapper(model)
@@ -261,6 +261,9 @@ def make_model(
                 encoder_params=encoder_params,
             )
 
+            model = Wrapper(model)
+            used_wrapper = True
+
         elif arch == 'FPN':
             print("Using architecture: FPN")
 
@@ -270,6 +273,7 @@ def make_model(
             in_channels=3,
             classes=classes,
             encoder_params=encoder_params,
+            encoder_depth=4
             )
 
         elif arch == 'PSPNet':

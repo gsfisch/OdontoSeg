@@ -4,13 +4,13 @@ import torch
 
 wandb_name = 'OdontoSeg'
 
-training_config = {
-  'experiment_name': 'vit_large_patch16_224_U-Net',
-  'encoder' : 'vit_large_patch16_224',
-  'architecture': 'U-Net',
+validation_config = {
+  'model_directory_path': 'models/caformer_b36_MAnet',
+  'configs_file_name': 'config.txt',
+  'model_file_name': 'caformer_b36_MAnet.pth',
   'epochs': 200,
-  'batch_size': 8,
-  'val_batch_size': 8, 
+  'batch_size': 1,
+  'val_batch_size': 32,
   'delay_per_batch': 5,
   'dataset_path' : '/home/fisch/Documents/OdontoSeg/dataset',
   #'dataset_path' : '/home/fisch/Documents/OdontoSeg/dataset_sri_lanka',
@@ -29,6 +29,8 @@ training_config = {
   'encoder_params': {
                 'img_size': 512,
                 "scale_factors": (8, 4, 2, 1),
+                #"scale_factors": (16, 8, 4, 2),
+                #"scale_factors": (4, 2, 1, 0.5),
             },
   'head_upsampling': 1,
 }
@@ -46,11 +48,11 @@ classes_color = [
 ]
 
 wandb_config ={
-  **training_config,
+  **validation_config,
   'data_augmentation': 'online',
-  'train_samples': len(os.listdir(os.path.join(training_config['dataset_path'], 'train/images'))),
-  'val_samples': len(os.listdir(os.path.join(training_config['dataset_path'], 'validation/images'))),
-  'test_samples': len(os.listdir(os.path.join(training_config['dataset_path'], 'test/images')))
+  'train_samples': len(os.listdir(os.path.join(validation_config['dataset_path'], 'train/images'))),
+  'val_samples': len(os.listdir(os.path.join(validation_config['dataset_path'], 'validation/images'))),
+  'test_samples': len(os.listdir(os.path.join(validation_config['dataset_path'], 'test/images')))
 }
 
 classes_color_float = [
