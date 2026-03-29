@@ -6,6 +6,7 @@ import torch.nn.functional as F
 from torch import Tensor, einsum, flatten
 from config import training_config
 from loss.surface import simplex
+import matplotlib.pyplot as plt
 
 # class DiceLoss(nn.Module):
 #     """
@@ -56,7 +57,7 @@ class DiceLoss(nn.Module):
     # Convert target to one-hot encoding
     true_1_hot = torch.eye(self.classes, device=device)[target.squeeze(1)]
     true_1_hot = true_1_hot.permute(0, 3, 1, 2).float()
-    
+
     probas = F.softmax(input, dim=1)
     
     # Compute intersection and union
@@ -65,6 +66,7 @@ class DiceLoss(nn.Module):
 
     # Compute Dice loss
     dice_score = 2. * intersection / (union + self.eps)
+    #dice_score = 2. * (intersection + self.eps) / (union + self.eps)
     dice_loss = 1. - dice_score.mean()
       
     return dice_loss

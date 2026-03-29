@@ -57,9 +57,13 @@ class UNET_Dataset(Dataset):
         Returns:
             torch.Tensor: Mask with class indices.
         """
-        mask_tensor = torch.from_numpy(mask).long()
+
+        mask_tensor = torch.from_numpy(mask)#.long()
+
         for idx, color in enumerate(classes_color):
+
             mask_tensor[torch.all(mask_tensor == color, dim=-1)] = idx
+
         return mask_tensor
 
     def __len__(self):
