@@ -14,55 +14,22 @@ from util.scheduler import FlatplusAnneal, FlatplusAnnealTeste
 from model_src import SegmentationModel
 from torchinfo import summary
 import torchseg
-# + "'" + training_config[''] + "',\n"  +
 
-def make_configs_file():
-    pass
-    '''
-    with open('config_test_file.txt', 'w') as config_file:
-        config_file.write(
-            "training_config = {\n" +
-            "'experiment_name': " + "'" + training_config['experiment_name'] + "',\n"  +
-            "'encoder': "  + "'" + training_config[''] + "',\n"  +
-            "'architecture': "  + "'" + training_config[''] + "',\n"  +
-            "'epochs': "   + "'" + training_config[''] + "',\n"  +
-            "'batch_size': "  + "'" + training_config[''] + "',\n"  +
-            "'val_batch_size': "  + "'" + training_config[''] + "',\n"  +
-            "'delay_per_batch': "  + "'" + training_config[''] + "',\n"  +
-            "'dataset_path': "  + "'" + training_config[''] + "',\n"  +
-            "'loss_function': "  + "'" + training_config[''] + "',\n"  +
-            "'optimizer': "  + "'" + training_config[''] + "',\n"  +
-            "'scheduler_step_size': "  + "'" + training_config[''] + "',\n"  +
-            "'learning_rate': "  + "'" + training_config[''] + "',\n"  +
-            "'weight_decay': "  + "'" + training_config[''] + "',\n"  +
-            "'classes': "  + "'" + training_config[''] + "',\n"  +
-            "'class_weigths': [0.6471186223837316, 1.0, 2.613295558781593, 0.0316647677528359 +# calculated by the inverse of pixels frequency" +
-
-
-
-            "'library': " 'torchseg', # smp and torchseg for now  +
-            "'encoder_depth': " + 4,  +
-            "'decoder_channels': " + (256, 128, 64, 32),  +
-            "'encoder_params': " + "{{"   +
-                            "'img_size': " + 512,  +
-                            "'scale_factors': " + (8, 4, 2, 1),  +
-                        "}},"  +
-            "'head_upsampling': 2 }}" )
-'''
 
 def train():
     torch.cuda.empty_cache()
-    #torch.cuda.reset_peak_memory_stats()
     experiment_name = training_config['experiment_name']
     num_epochs = training_config['epochs']
-    #num_epochs = training_config['epochs'] - num_files
+    epoch_to_unfreeze_encoder = 300
+    
     
     # create experiment folder
     folder_experiment = os.path.join(path_models, f"{experiment_name}")
-    os.makedirs(folder_experiment, exist_ok=True)
-    num_files = len([f for f in os.listdir(folder_experiment) if os.path.isfile(os.path.join(folder_experiment, f)) and f != 'model_src.py'])
-    initial_epoch = num_files + 1
-    print(f'Total files: {num_files}')
+    print(f"Creating folder: {folder_experiment}")
+    os.makedirs(folder_experiment, exist_ok=False)
+    #num_files = len([f for f in os.listdir(folder_experiment) if os.path.isfile(os.path.join(folder_experiment, f)) and f != 'model_src.py'])
+    #print(f'Total files: {num_files}')
+
 
     # initialize model
     model = make_model(training_config['encoder'], training_config['architecture'], 
@@ -74,7 +41,7 @@ def train():
     #    param.requires_grad = False
 
 
-    summary(model, input_size=(training_config['batch_size'], 3, 512, 512))
+    #summary(model, input_size=(training_config['batch_size'], 3, 512, 512))
 
     #model = SegmentationModel().cuda()
     #if num_files == 0:
@@ -114,12 +81,22 @@ def train():
     
     best_model_loss = float('inf')
     best_model_dice = float('-inf')
-    best_epoch = num_files
 
-    # Save configs file
-    make_configs_file()
     
-    for epoch in range(initial_epoch, initial_epoch + num_epochs):
+    for epoch in range(num_epochs):
+        # Unfreeze encoder after warmup
+        if epoch >= epoch_to_unfreeze_encoder - 1:
+            # If no wrapper was used
+            if hasattr(model, "encoder"):
+                for param in model.encoder.parameters():
+                    param.requires_grad = True
+
+            # If wrapper was used 
+            elif hasattr(model, "model") and hasattr(model.model, "encoder"):
+                for param in model.model.encoder.parameters():
+                    param.requires_grad = True
+
+
         # Train
         metrics_train = train_loop(training_generator, opt, model)
 
@@ -144,7 +121,7 @@ def train():
                 
 
         # Print and log results
-        print(f'\nEpoch {epoch}/{initial_epoch + num_epochs - 1}, '
+        print(f'\nEpoch {epoch}/{num_epochs - 1}, '
               f'train_loss: {metrics_train["loss"]:.3f}, val_loss: {metrics_val["loss"]:.3f}, '
               f'train_acc: {metrics_train["accuracy"]:.3f}, val_acc: {metrics_val["accuracy"]:.3f}, '
               f'train_mIoU: {metrics_train["mIoU"]:.3f}, val_mIoU: {metrics_val["mIoU"]:.3f}\n ',
@@ -167,19 +144,19 @@ def train():
         })
         
     # Print best results
-    print(f'Best train_loss: {best_model_loss:.3f}')
-    print(f'Best epoch: {best_epoch}')
+    #print(f'Best train_loss: {best_model_loss:.3f}')
+    #print(f'Best epoch: {best_epoch}')
 
-    # Finish WandB logging
-    #wandb.finish()
-
-    #return
-    
-     # Run test routine
-    test_routine(folder_experiment, best_epoch, wand_logged=True)
-    
     # Finish WandB logging
     wandb.finish()
+
+    return
+    
+     # Run test routine
+    #test_routine(folder_experiment, best_epoch, wand_logged=True)
+    
+    # Finish WandB logging
+    #wandb.finish()
 
 def logging_wandb(metrics_train, metrics_validation):
     return {

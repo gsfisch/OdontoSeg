@@ -1,0 +1,91 @@
+import torch.nn as nn
+
+
+class ConvBlock(nn.Module):
+    def __init__(self, in_channels, out_channels):
+        super().__init__()
+
+        self.double_conv = nn.Sequential(
+            nn.Conv2d(in_channels, out_channels, kernel_size=3, padding=1),
+            nn.BatchNorm2d(out_channels),
+            nn.ReLU(inplace=True),
+
+            nn.Conv2d(out_channels, out_channels, kernel_size=3, padding=1),
+            nn.BatchNorm2d(out_channels),
+            nn.ReLU(inplace=True)
+        )
+
+
+    def forward(self, x):
+        x = self.double_conv(x)
+
+        return x
+
+
+class DownSampling(nn.Module):
+    def __init__(self, in_channels, out_channels):
+        super().__init__()
+
+        self.down = nn.Conv2d(in_channels, out_channels, kernel_size=3, stride=2, padding=1)
+
+
+    def forward(self, x):
+        x = self.down(x)
+
+        return x
+
+
+class Encoder(nn.Module):
+    def __init__(self, in_channels=3, in_height=512, in_width=512, encoder_channels=[96, 192, 384, 576, 1152]):
+        assert in_height % 16 == 0 and in_width % 16 == 0
+
+        super().__init__()
+
+        self.conv_block_1 = ConvBlock(in_channels, encoder_channels[0])
+        self.down_sampling_1 = DownSampling(encoder_channels[0], encoder_channels[1])
+
+        self.conv_block_2 = ConvBlock(encoder_channels[1], encoder_channels[1])
+        self.down_sampling_2 = DownSampling(encoder_channels[1], encoder_channels[2])
+
+        self.conv_block_3 = ConvBlock(encoder_channels[2], encoder_channels[2])
+        self.down_sampling_3 = DownSampling(encoder_channels[2], encoder_channels[3])
+
+        self.conv_block_4 = ConvBlock(encoder_channels[3], encoder_channels[3])
+        self.down_sampling_4 = DownSampling(encoder_channels[3], encoder_channels[4])
+
+        self.conv_block_5 = ConvBlock(encoder_channels[4], encoder_channels[4])
+
+
+    def forward(self, x):
+        x1 = self.conv_block_1(x)
+        x2 = self.down_sampling_1(x1)
+
+        x2 = self.conv_block_2(x2)
+        x3 = self.down_sampling_2(x2)
+
+        x3 = self.conv_block_3(x3)
+        x4 = self.down_sampling_3(x3)
+
+        x4 = self.conv_block_4(x4)
+        bottleneck = self.down_sampling_4(x4)
+
+        bottleneck = self.conv_block_5(bottleneck)
+
+        return x1, x2, x3, x4, bottleneck
+
+
+
+if __name__ == "__main__":
+    import torch
+
+    img = torch.rand(1, 3, 512, 512)
+
+    model = Encoder(in_channels=3, encoder_channels=[96, 192, 384, 576, 1152])
+
+    x1, x2, x3, x4, bottleneck = model(img)
+
+    print(x1.shape)
+    print(x2.shape)
+    print(x3.shape)
+    print(x4.shape)
+    print(bottleneck.shape)

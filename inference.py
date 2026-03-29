@@ -7,6 +7,7 @@ from torch.autograd import Variable
 from torchinfo import summary
 from util.model import make_model
 from skimage.io import imread, imsave
+from skimage import transform
 from datetime import datetime
 import numpy as np
 import imageio.v2 as imageio
@@ -23,7 +24,7 @@ class_colors_list = {
 def prepare_img(img):
     temp = []
 
-    imgTorch = torch.FloatTensor(img)
+    imgTorch = torch.FloatTensor(transform.resize(img, (512, 512), anti_aliasing=True))
     imgTorch = imgTorch.permute(2, 0, 1)
     temp.append(imgTorch.numpy())
     tempTorch = torch.FloatTensor(np.array(temp))
@@ -45,11 +46,12 @@ def mask_to_class(final_output):
 
 
 def main():
-    model_directory_path = "./models/swin_base_patch4_window7_224_U-Net++"  # Choose model
-    image_path = "./dataset/test/images/carcinoma_37.png"                   # Choose image
+    model_directory_path = "models/MyArchitecture_pvt_v2_b1__U_Net"  # Choose model
+    #image_path = "./dataset/test/images/leucoplasia_N-103.png"                   # Choose image
+    image_path = "./dataset/test/images/ploliferativas_IMG_2088.png"                   # Choose image
     configs_file_name = "configs_used.txt"
-    model_file_name = model_directory_path[9:] + ".pth"
-    inference_directory_path = os.path.join("./inference/", model_directory_path[9:], datetime.now().strftime("%Y-%m-%d_%H:%M:%S.%f")[:-3])
+    model_file_name = model_directory_path[7:] + ".pth"
+    inference_directory_path = os.path.join("./inference/", model_directory_path[7:], datetime.now().strftime("%Y-%m-%d_%H:%M:%S.%f")[:-3])
 
 
     # Read training configurations
@@ -75,32 +77,12 @@ def main():
         softmax = nn.Softmax(dim=1).cuda()
         original_image = imread(image_path).astype(np.float32) / 255.0
 
-        #print("Original image:")
-        #print(original_image.shape)
-        #print(original_image)
 
         logits = model(prepare_img(original_image))    # Output Shape: (B, C ,H ,W) -> (1, 4, 512, 512)
         output = softmax(logits)
-
-        #print(output.shape)
-
         predicted = torch.argmax(output, dim=1)
-
-        #print(predicted.shape)
-
-        masks_image = mask_to_class(predicted[0]) #.astype(np.uint8) * 255
-
-        #print("Masks:")
-        #print(type(masks_image))
-        #print(masks_image.shape)
-        #print(masks_image[0, :10])
-
-        segmented_image = 0.8*original_image + 0.2*masks_image
-
-        #print("Segmented Img")
-        #print(type(segmented_image))
-        #print(segmented_image.shape)
-        #print(segmented_image[0, :10])
+        masks_image = mask_to_class(predicted[0])
+        segmented_image = 0.8*transform.resize(original_image, (512, 512), anti_aliasing=True) + 0.2*masks_image
 
 
         # Save images
