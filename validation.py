@@ -3,7 +3,7 @@ os.environ['PYTORCH_CUDA_ALLOC_CONF'] = 'expandable_segments:True'
 import torch
 from util.data import get_data_generators
 from util.model import make_model
-from loops import val_loop
+from loops import val_loop, test_loop
 from optimizers.main import optimizer
 import wandb
 from datetime import datetime
@@ -23,6 +23,7 @@ def validate():
 
     model_directory_path = validation_config['model_directory_path']
     configs_file_name = validation_config['configs_file_name']
+    device = torch.device('cuda')
     model_file_name = validation_config['model_file_name']
 
 
@@ -33,29 +34,46 @@ def validate():
 
 
     # Initialize and load model
+    '''
     model = make_model(training_config['encoder'], training_config['architecture'], 
         classes=training_config['classes'], library=training_config['library'],
         decoder_channels=training_config['decoder_channels'], encoder_depth=training_config['encoder_depth'],
         encoder_params=training_config['encoder_params'], head_upsampling=training_config['head_upsampling']).cuda()
+    '''
 
+    model = make_model(
+    training_config['encoder'],
+    training_config['architecture'],
+    training_config['classes'],
+    library='smp',
+    #encoder_depth=0,
+    #decoder_channels=(),
+    #encoder_params={},
+    #head_upsampling=2,
+    )    
+    model = model.to(device)
+    
     model.load_state_dict(torch.load(os.path.join(model_directory_path, model_file_name), weights_only="True"))
-    summary(model, input_size=(validation_config['batch_size'], 3, 512, 512))
 
+    #summary(model, input_size=(training_config['batch_size'], 3, 512, 512))
     
     # get data generators
-    training_generator, valid_generator = get_data_generators()
+    training_generator, valid_generator, test_generator = get_data_generators(training_config['batch_size'])
+
+    with torch.no_grad():
+
+        # Validate
+        metrics_val = val_loop(test_generator, model)
 
 
-    # Validate
-    metrics_val = val_loop(valid_generator, model)
-
-
-    # Print and log results
-    print(  f'val_loss: {metrics_val["loss"]:.3f}\n' +
-            f'val_acc: {metrics_val["accuracy"]:.3f}\n' +
-            f'val_mIoU: {metrics_val["mIoU"]:.3f}\n' +
-            f'val_dice: {metrics_val["dice"]:.3f}\n'
-        )
+        # Print and log results
+        print(  f'val_loss: {metrics_val["loss"]:.4f}\n' +
+                f'val_acc: {metrics_val["accuracy"]:.4f}\n' +
+                f'val_mIoU: {metrics_val["mIoU"]:.4f}\n' +
+                f'val_dice: {metrics_val["dice"]:.4f}\n' +
+                f'val_precision: {metrics_val["precision"]:.4f}\n' +
+                f'val_recall: {metrics_val["recall"]:.4f}\n'
+            )
 
 
 

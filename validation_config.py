@@ -5,13 +5,13 @@ import torch
 wandb_name = 'OdontoSeg'
 
 validation_config = {
-  'model_directory_path': 'models/caformer_b36_MAnet',
+  'model_directory_path': 'models/efficientnet-b6_FPN',
   'configs_file_name': 'config.txt',
-  'model_file_name': 'caformer_b36_MAnet.pth',
+  'model_file_name': 'efficientnet-b6_FPN.pth',
   'epochs': 200,
-  'batch_size': 1,
-  'val_batch_size': 32,
-  'delay_per_batch': 5,
+   #'batch_size': 1,
+   #'val_batch_size': 1,
+  'delay_per_batch': 1,
   'dataset_path' : '/home/fisch/Documents/OdontoSeg/dataset',
   #'dataset_path' : '/home/fisch/Documents/OdontoSeg/dataset_sri_lanka',
   'loss_function' : 'dice',
@@ -23,7 +23,7 @@ validation_config = {
   'class_weigths': 
   [0.6471186223837316, 1.0, 2.613295558781593, 0.03166476775283598], # calculated by the inverse of pixels frequency
   #'library': 'torchseg', # smp and torchseg for now
-  'library': 'torchseg',
+  'library': 'smp',
   'encoder_depth': 4,
   'decoder_channels': (256, 128, 64, 32),
   'encoder_params': {
@@ -61,3 +61,4 @@ classes_color_float = [
   torch.FloatTensor([[[255, 255, 0]]]), # proliferativas
   torch.FloatTensor([[[0, 0, 255]]])    # background
 ]
+

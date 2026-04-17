@@ -47,11 +47,13 @@ def load_data(dataset_path: str) -> Tuple[List[str], List[str], List[str], List[
     """
     train_path = os.path.join(dataset_path, 'train')
     valid_path = os.path.join(dataset_path, 'validation')
+    test_path = os.path.join(dataset_path, 'test')
 
     x_train, y_train = load_images_from_folder(train_path)
     x_valid, y_valid = load_images_from_folder(valid_path)
+    x_test, y_test = load_images_from_folder(test_path)
 
-    return x_train, y_train, x_valid, y_valid
+    return x_train, y_train, x_valid, y_valid, x_test, y_test
 
 def create_data_loader(dataset: UNET_Dataset, batch_size: int, shuffle: bool, num_workers: int) -> torch.utils.data.DataLoader:
     """
@@ -68,7 +70,7 @@ def create_data_loader(dataset: UNET_Dataset, batch_size: int, shuffle: bool, nu
     """
     return torch.utils.data.DataLoader(dataset=dataset, batch_size=batch_size, shuffle=shuffle, num_workers=num_workers)
 
-def get_data_generators() -> Tuple[torch.utils.data.DataLoader, torch.utils.data.DataLoader]:
+def get_data_generators(batch_size=training_config['batch_size']) -> Tuple[torch.utils.data.DataLoader, torch.utils.data.DataLoader]:
     """
     Prepares training and validation DataLoaders.
 
@@ -77,20 +79,22 @@ def get_data_generators() -> Tuple[torch.utils.data.DataLoader, torch.utils.data
             Training and validation DataLoaders.
     """
     dataset_path = training_config['dataset_path']
-    batch_size = training_config['batch_size']
-    val_batch_size = training_config['val_batch_size']
+    #batch_size = training_config['batch_size']
+    val_batch_size = batch_size #training_config['val_batch_size']
 
     AUGMENTATIONS_TRAIN, AUGMENTATIONS_VALID = create_augmentations()
 
-    x_train, y_train, x_valid, y_valid = load_data(dataset_path)
+    x_train, y_train, x_valid, y_valid, x_test, y_test = load_data(dataset_path)
 
     data_train = UNET_Dataset(x_train, y_train, AUGMENTATIONS_TRAIN)
     data_valid = UNET_Dataset(x_valid, y_valid, AUGMENTATIONS_VALID)
+    data_test = UNET_Dataset(x_test, y_test, AUGMENTATIONS_VALID)
 
     train_loader = create_data_loader(data_train, batch_size, shuffle=True, num_workers=0)
     valid_loader = create_data_loader(data_valid, batch_size=val_batch_size, shuffle=False, num_workers=0)
+    test_loader = create_data_loader(data_test, batch_size=val_batch_size, shuffle=False, num_workers=0)
 
-    return train_loader, valid_loader
+    return train_loader, valid_loader, test_loader
 
 def load_data_test(dataset_path: str) -> Tuple[List[str], List[str]]:
     """
@@ -118,7 +122,7 @@ def get_test_generator() -> torch.utils.data.DataLoader:
     """
     dataset_path = training_config['dataset_path']
 
-    _, _, _, _ = load_data(dataset_path)  # Load data to initialize augmentations (if needed)
+    _, _, _, _, _, _ = load_data(dataset_path)  # Load data to initialize augmentations (if needed)
     AUGMENTATIONS_TRAIN, AUGMENTATIONS_VALID = create_augmentations()  # May not be used
 
     x_test, y_test = load_data_test(dataset_path)

@@ -38,11 +38,12 @@ def blendImage(original_path, image_path):
 
 def check_segmentation():
     torch.cuda.empty_cache()
-    dataset_path = '/home/fisch/Documents/OdontoSeg/dataset_sri_lanka_joint/'
-    model_directory_path = 'models/swin_large_patch4_window7_224_MAnet'
+    #dataset_path = '/home/fisch/Documents/OdontoSeg/segmentation_results/'
+    dataset_path = './dataset/validation/'
+    model_directory_path = 'models/swin_large_patch4_window7_224_U-Net'
     configs_file_name = 'config.txt'
-    model_file_name = 'swin_large_patch4_window7_224_MAnet.pth'
-    save_images_path =  os.path.join('segmentation_results/' + model_file_name[:-4])
+    model_file_name = 'swin_large_patch4_window7_224_U-Net.pth'
+    save_images_path =  os.path.join('new_new_new_segmentation_results/' + model_file_name[:-4])
 
     os.makedirs(save_images_path, exist_ok=False)
 
@@ -53,13 +54,27 @@ def check_segmentation():
 
 
     # Initialize and load model
+    
     model = make_model(training_config['encoder'], training_config['architecture'], 
         classes=training_config['classes'], library=training_config['library'],
         decoder_channels=training_config['decoder_channels'], encoder_depth=training_config['encoder_depth'],
         encoder_params=training_config['encoder_params'], head_upsampling=training_config['head_upsampling']).cuda()
+    '''
+
+    model = make_model(
+    encoder=training_config['encoder'],
+    arch=training_config['architecture'],
+    classes=4,
+    library='smp',
+    #encoder_depth=0,
+    #decoder_channels=(),
+    #encoder_params={},
+    #head_upsampling=2,
+    )
+    '''
 
     model.load_state_dict(torch.load(os.path.join(model_directory_path, model_file_name), weights_only="True"))
-    summary(model, input_size=(validation_config['batch_size'], 3, 512, 512))
+    #summary(model, input_size=(training_config['batch_size'], 3, 512, 512))
 
 
     for img_filename in os.listdir(dataset_path + 'images'):
@@ -77,7 +92,7 @@ def check_segmentation():
 
 
 
-    exit()
+    #exit()
 
     
     # get data generators
@@ -89,10 +104,10 @@ def check_segmentation():
 
 
     # Print and log results
-    print(  f'val_loss: {metrics_val["loss"]:.3f}\n' +
-            f'val_acc: {metrics_val["accuracy"]:.3f}\n' +
-            f'val_mIoU: {metrics_val["mIoU"]:.3f}\n' +
-            f'val_dice: {metrics_val["dice"]:.3f}\n'
+    print(  f'val_loss: {metrics_val["loss"]:.4f}\n' +
+            f'val_acc: {metrics_val["accuracy"]:.4f}\n' +
+            f'val_mIoU: {metrics_val["mIoU"]:.4f}\n' +
+            f'val_dice: {metrics_val["dice"]:.4f}\n'
         )
 
 
