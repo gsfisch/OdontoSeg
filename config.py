@@ -1,8 +1,7 @@
 import os
 import torch
 
-
-wandb_name = 'OdontoSeg'
+wandb_name = 'OdontoSeg_Reviewed'
 
 training_config = {
   'experiment_name': 'vit_large_patch16_224_U-Net',
@@ -11,9 +10,8 @@ training_config = {
   'epochs': 200,
   'batch_size': 8,
   'val_batch_size': 8, 
-  'delay_per_batch': 5,
-  'dataset_path' : '/home/fisch/Documents/OdontoSeg/dataset',
-  #'dataset_path' : '/home/fisch/Documents/OdontoSeg/dataset_sri_lanka',
+  'delay_per_batch': 1,
+  'dataset_path' : '/home/fisch/Documents/OdontoSeg/datasets/Dataset_Imagens_Clinicas_V2.0',
   'loss_function' : 'dice',
   'optimizer': 'adamw',
   'scheduler_step_size': 0.8,
@@ -31,6 +29,7 @@ training_config = {
                 "scale_factors": (8, 4, 2, 1),
             },
   'head_upsampling': 1,
+  'freeze_encoder': True,
 }
 
 path_models = '/home/fisch/Documents/OdontoSeg/models/'
@@ -39,8 +38,8 @@ path_save_evaluation_percentage = '/home/fisch/Documents/OdontoSeg/experiments/c
 save_percentage = True
 
 classes_color = [
-  torch.tensor([255, 0, 0]),   # NMM
-  torch.tensor([0, 255, 0]),   # DPMB
+  torch.tensor([255, 0, 0]),   # carcinoma
+  torch.tensor([0, 255, 0]),   # leucoplasia
   torch.tensor([255, 255, 0]), # proliferativas
   torch.tensor([0, 0, 255])    # background
 ]

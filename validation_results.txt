@@ -38,6 +38,7 @@ Giovani:
 	val_acc: 0.897
 	val_mIoU: 0.326
 	val_dice: 0.319
+
 	
 	
 	reviewed-dataset_unet_resnet34:

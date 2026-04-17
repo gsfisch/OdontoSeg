@@ -103,7 +103,7 @@ class eomt_wrapper(nn.Module):
 
         return output
 
-'''
+
 def make_model(
     encoder: str,
     arch: str,
@@ -273,12 +273,8 @@ def make_model(
             in_channels=3,
             classes=classes,
             encoder_params=encoder_params,
-            encoder_depth=4,
-            
+            encoder_depth=5
             )
-
-            model = Wrapper(model) # apenas para deit3
-            used_wrapper = True
 
         elif arch == 'PSPNet':
             print("Using architecture: PSPNet")
@@ -356,13 +352,7 @@ def make_model(
                 feature_size=36,
                 use_checkpoint=True
             )
-
-            return model
-
-        elif arch == 'UNETR':
-            print("Using architecture: UNETR")
-
-            
+            '''
             model = UNETR(
                 in_channels=3,
                 out_channels=4,
@@ -376,7 +366,8 @@ def make_model(
                 norm_name="instance",
                 res_block=True,
                 dropout_rate=0.1,
-            )            
+            )
+            '''
 
             return model
 
@@ -453,7 +444,6 @@ def make_model(
     encoder_depth=0,
     decoder_channels=(),
     encoder_params={},
-    freeze_encoder = False,
     head_upsampling=2,
     ) -> torch.nn.Module:
 
@@ -477,11 +467,7 @@ def make_model(
                 feature_size=36,
                 use_checkpoint=True
             )
-
-            return model
-
-        elif arch == 'UNETR':
-            
+            ''
             model = UNETR(
                 in_channels=3,
                 out_channels=4,
@@ -496,7 +482,7 @@ def make_model(
                 res_block=True,
                 dropout_rate=0.1,
             )
-            
+            ''
 
             return model
 
@@ -603,7 +589,7 @@ def make_model(
             model = smp.FPN(
                 encoder_name=encoder,
                 classes=classes,
-                #activation="softmax" if classes > 1 else "sigmoid",
+                activation="softmax" if classes > 1 else "sigmoid",
                 encoder_weights="imagenet",
                 encoder_depth  = 5,
                 decoder_pyramid_channels = 256,
@@ -677,7 +663,6 @@ def make_model(
             model = Wrapper(model)
             used_wrapper = True
 
-
         elif arch == 'Linknet':
             model = torchseg.Linknet(
                 encoder_name=encoder,
@@ -688,22 +673,14 @@ def make_model(
                 encoder_params=encoder_params,
             )
 
-            model = Wrapper(model)
-            used_wrapper = True
-
         elif arch == 'FPN':
             model = torchseg.FPN(
             encoder_name=encoder,
             encoder_weights=True,
             in_channels=3,
             classes=classes,
-            encoder_depth=encoder_depth,
             encoder_params=encoder_params,
             )
-            '''
-            model = Wrapper(model)
-            used_wrapper = True
-            '''
 
         elif arch == 'PSPNet':
             model= torchseg.PSPNet(
@@ -747,21 +724,8 @@ def make_model(
 
         else:
             print("Architecture not implemented")
-            exit()
 
-        if freeze_encoder:
-            if used_wrapper:
-                for param in model.model.encoder.parameters():
-                    param.requires_grad = False
-
-            else:
-                for param in model.encoder.parameters():
-                    param.requires_grad = False
-
-
-        return model
-
-    '''
+    
     # Freeze encoder
     if used_wrapper:
         for param in model.model.encoder.parameters():
@@ -770,10 +734,9 @@ def make_model(
     else:
         for param in model.encoder.parameters():
             param.requires_grad = False
-    '''
-     
+        
     return model
-
+'''
 
 def make_custom_model():
     pass
