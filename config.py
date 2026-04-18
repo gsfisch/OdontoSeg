@@ -4,13 +4,13 @@ import torch
 wandb_name = 'OdontoSeg_Reviewed'
 
 training_config = {
-  'experiment_name': 'vit_large_patch16_224_U-Net',
-  'encoder' : 'vit_large_patch16_224',
-  'architecture': 'U-Net',
+  'experiment_name': 'caformer_b36_MAnet',
+  'encoder' : 'caformer_b36',
+  'architecture': 'MAnet',
   'epochs': 200,
-  'batch_size': 8,
-  'val_batch_size': 8, 
-  'delay_per_batch': 1,
+  'batch_size': 3,
+  'val_batch_size': 3,
+  #'delay_per_batch': 5,
   'dataset_path' : '/home/fisch/Documents/OdontoSeg/datasets/Dataset_Imagens_Clinicas_V2.0',
   'loss_function' : 'dice',
   'optimizer': 'adamw',
@@ -23,14 +23,49 @@ training_config = {
   #'library': 'torchseg', # smp and torchseg for now
   'library': 'torchseg',
   'encoder_depth': 4,
+  'freeze_encoder': False,
+  'need_wrapper': True,
   'decoder_channels': (256, 128, 64, 32),
   'encoder_params': {
                 'img_size': 512,
                 "scale_factors": (8, 4, 2, 1),
             },
   'head_upsampling': 1,
-  'freeze_encoder': True,
 }
+
+
+'''
+{
+  'experiment_name': 'caformer_b36_U-Net++_teste',
+  'encoder' : 'caformer_b36',
+  'architecture': 'U-Net++',
+  'epochs': 200,
+  'batch_size': 1,
+  'val_batch_size': 1, 
+  #'delay_per_batch': 1,
+  'dataset_path' : '/home/fisch/Documents/OdontoSeg/datasets/Dataset_Imagens_Clinicas_V2.0',
+  'loss_function' : 'dice',
+  'optimizer': 'adamw',
+  'scheduler_step_size': 0.8,
+  'learning_rate': 1e-4,
+  'weight_decay' : 1e-4,
+  'classes': 4,
+  'class_weigths': 
+  [0.6471186223837316, 1.0, 2.613295558781593, 0.03166476775283598], # calculated by the inverse of pixels frequency
+  #'library': 'torchseg', # smp and torchseg for now
+  'library': 'torchseg',
+  'encoder_depth': 4,
+  'freeze_encoder': False,
+  'need_wrapper': False,
+  'decoder_channels': (256, 128, 64, 32),
+  'encoder_params': {
+                'img_size': 512,
+                "scale_factors": (8, 4, 2, 1),
+            },
+  'head_upsampling': 2,
+}
+'''
+
 
 path_models = '/home/fisch/Documents/OdontoSeg/models/'
 path_save_evaluation = '/home/fisch/Documents/OdontoSeg/experiments/comparison/'

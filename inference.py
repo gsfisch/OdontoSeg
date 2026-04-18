@@ -80,6 +80,19 @@ def main():
 
 
     # Initialize and load model
+     if training_config['library'] == 'smp':
+        model = make_model(training_config['encoder'], training_config['architecture'],
+                            training_config['classes'], library='smp',
+                            freeze_encoder=training_config['freeze_encoder'], need_wrapper=training_config['need_wrapper']).cuda()
+
+    else:    
+        model = make_model(training_config['encoder'], training_config['architecture'], 
+                       classes=training_config['classes'], library=training_config['library'],
+                       decoder_channels=training_config['decoder_channels'], encoder_depth=training_config['encoder_depth'],
+                       encoder_params=training_config['encoder_params'], head_upsampling=training_config['head_upsampling'],
+                       freeze_encoder=training_config['freeze_encoder'], need_wrapper=training_config['need_wrapper']).cuda()
+
+    '''
     if training_config['library'] == 'smp':
         model = make_model(
                 training_config['encoder'],
@@ -93,7 +106,7 @@ def main():
             classes=training_config['classes'], library=training_config['library'],
             decoder_channels=training_config['decoder_channels'], encoder_depth=training_config['encoder_depth'],
             encoder_params=training_config['encoder_params'], head_upsampling=training_config['head_upsampling']).cuda()
-
+    '''
 
     model.load_state_dict(torch.load(os.path.join(model_directory_path, model_file_name), weights_only="True"))
     model.eval()

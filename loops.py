@@ -117,7 +117,7 @@ def train_loop(generator, optimizer, model, num_classes=4):
         loss = criterion(option=loss_function, outputs=outputs, masks=masks)
         loss.backward()
         optimizer.step()
-        time.sleep(training_config['delay_per_batch'])
+        #time.sleep(training_config['delay_per_batch'])
         
         '''
         # Compute and accumulate metrics
@@ -342,7 +342,7 @@ def test_loop(generator, model):
             images = images.permute(0, 3, 1, 2).cuda()
             outputs = model(images)
             loss = criterion(option=loss_function, outputs=outputs.clone(), masks=masks.clone())
-            time.sleep(training_config['delay_per_batch'])
+            #time.sleep(training_config['delay_per_batch'])
 
             # Compute and accumulate metrics
             metrics = compute_metrics(outputs, masks)
