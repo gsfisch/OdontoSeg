@@ -11,7 +11,7 @@ from datetime import datetime
 from config import training_config, wandb_config, wandb_name, path_models
 from util.scheduler import FlatplusAnneal, FlatplusAnnealTeste
 #from transformer_model import SegmentationModel
-from model_src import SegmentationModel
+#from model_src import SegmentationModel
 from torchinfo import summary
 import torchseg
 
@@ -21,26 +21,26 @@ def train():
     experiment_name = training_config['experiment_name']
     num_epochs = training_config['epochs']
     epoch_to_unfreeze_encoder = 300
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-
-    
+    #device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
     # initialize model
     if training_config['library'] == 'smp':
         model = make_model(training_config['encoder'], training_config['architecture'],
-            training_config['classes'], library='smp', freeze_encoder=training_config['freeze_encoder']).cuda()
+                            training_config['classes'], library='smp',
+                            freeze_encoder=training_config['freeze_encoder'], need_wrapper=training_config['need_wrapper']).cuda()
 
     else:    
         model = make_model(training_config['encoder'], training_config['architecture'], 
                        classes=training_config['classes'], library=training_config['library'],
                        decoder_channels=training_config['decoder_channels'], encoder_depth=training_config['encoder_depth'],
                        encoder_params=training_config['encoder_params'], head_upsampling=training_config['head_upsampling'],
-                       freeze_encoder=training_config['freeze_encoder']).cuda()
+                       freeze_encoder=training_config['freeze_encoder'], need_wrapper=training_config['need_wrapper']).cuda()
     
 
-    #summary(model, input_size=(training_config['batch_size'], 3, 512, 512))
+    summary(model, input_size=(training_config['batch_size'], 3, 512, 512))
+    #print(dir(model.encoder))
+    #print(model.encoder._named_members)
 
     
     # get data generators
@@ -74,6 +74,7 @@ def train():
     
     for epoch in range(num_epochs):
         # Unfreeze encoder after warmup
+        '''
         if epoch >= epoch_to_unfreeze_encoder - 1:
             # If no wrapper was used
             if hasattr(model, "encoder"):
@@ -84,7 +85,7 @@ def train():
             elif hasattr(model, "model") and hasattr(model.model, "encoder"):
                 for param in model.model.encoder.parameters():
                     param.requires_grad = True
-
+        '''
 
         # Train
         metrics_train = train_loop(training_generator, opt, model)
@@ -94,20 +95,8 @@ def train():
 
         # Step scheduler
         scheduler.step()
-        
-        # Save model checkpoint
-        # model_path = os.path.join(folder_experiment, f'{training_config["experiment_name"]}-{epoch}.pt')
-        #model_path = os.path.join(folder_experiment, f'{experiment_name}_epoch_{epoch}.pth')        
-        #torch.save(model.state_dict(), model_path)
-        #torch.save(model, model_path)
-        #print(f"Model '{model_path}' saved.")
-        current_lr = opt.param_groups[0]['lr']
 
-        # Update best model if needed
-        #if metrics_train['loss'] < best_model_loss:
-        #    best_model_loss = metrics_train['loss']
-        #    best_epoch = epoch
-                
+        current_lr = opt.param_groups[0]['lr']
 
         # Print and log results
         print(f'\nEpoch {epoch}/{num_epochs - 1}, '
@@ -122,7 +111,6 @@ def train():
         # Check best checkpoint based on Validation Dice
         if metrics_val['dice'] > best_model_dice:
             best_model_dice = metrics_val['dice']
-
             
             model_path = os.path.join(folder_experiment, f'{experiment_name}.pth')
             torch.save(model.state_dict(), model_path)
@@ -136,21 +124,11 @@ def train():
             'learning_rate': current_lr,
             'epoch': epoch
         })
-        
-    # Print best results
-    #print(f'Best train_loss: {best_model_loss:.3f}')
-    #print(f'Best epoch: {best_epoch}')
 
-    # Finish WandB logging
     wandb.finish()
 
     return
-    
-     # Run test routine
-    #test_routine(folder_experiment, best_epoch, wand_logged=True)
-    
-    # Finish WandB logging
-    #wandb.finish()
+
 
 def logging_wandb(metrics_train, metrics_validation):
     return {

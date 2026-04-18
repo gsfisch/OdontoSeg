@@ -455,6 +455,7 @@ def make_model(
     encoder_params={},
     freeze_encoder = False,
     head_upsampling=2,
+    need_wrapper=False,
     ) -> torch.nn.Module:
 
     used_wrapper = False
@@ -500,7 +501,7 @@ def make_model(
 
             return model
 
-    ''
+    '''
     if arch == 'EoMT':
         #config = EomtConfig(image_size=[512, 512])
         #from transformers import EomtConfig
@@ -572,7 +573,7 @@ def make_model(
             param.requires_grad = False
         
         return model
- 
+    '''
 
     if library == 'smp':
         if arch == 'SegFormer':
@@ -636,6 +637,7 @@ def make_model(
                 classes=classes,
                 encoder_weights="imagenet",
             )
+
     elif library == 'torchseg':
         if arch == 'U-Net':
             model = torchseg.Unet(
@@ -660,8 +662,9 @@ def make_model(
                 encoder_params=encoder_params,
             )
 
-            model = Wrapper(model)
-            used_wrapper = True
+            if need_wrapper:
+                model = Wrapper(model)
+
 
         elif arch == 'MAnet':
             model = torchseg.MAnet(
@@ -674,8 +677,9 @@ def make_model(
                 encoder_params=encoder_params,
             )
 
-            model = Wrapper(model)
-            used_wrapper = True
+            if need_wrapper:
+                model = Wrapper(model)
+            
 
 
         elif arch == 'Linknet':
@@ -688,8 +692,9 @@ def make_model(
                 encoder_params=encoder_params,
             )
 
-            model = Wrapper(model)
-            used_wrapper = True
+            if need_wrapper:
+                model = Wrapper(model)
+
 
         elif arch == 'FPN':
             model = torchseg.FPN(
@@ -700,10 +705,10 @@ def make_model(
             encoder_depth=encoder_depth,
             encoder_params=encoder_params,
             )
-            '''
-            model = Wrapper(model)
-            used_wrapper = True
-            '''
+
+            if need_wrapper:
+                model = Wrapper(model)
+
 
         elif arch == 'PSPNet':
             model= torchseg.PSPNet(
@@ -748,9 +753,9 @@ def make_model(
         else:
             print("Architecture not implemented")
             exit()
-
+        
         if freeze_encoder:
-            if used_wrapper:
+            if need_wrapper:
                 for param in model.model.encoder.parameters():
                     param.requires_grad = False
 
@@ -759,19 +764,6 @@ def make_model(
                     param.requires_grad = False
 
 
-        return model
-
-    '''
-    # Freeze encoder
-    if used_wrapper:
-        for param in model.model.encoder.parameters():
-            param.requires_grad = False
-
-    else:
-        for param in model.encoder.parameters():
-            param.requires_grad = False
-    '''
-     
     return model
 
 
