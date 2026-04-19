@@ -21,6 +21,7 @@ segmentation_models_pytorch/encoders/__pycache__/
 segmentation_models_pytorch/fpn/__pycache__/
 
 giovani_best-models.zip
+vit_checkpoint
 giovani_best-models/
 test_ds.py
 models
