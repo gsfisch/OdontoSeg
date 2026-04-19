@@ -5,12 +5,12 @@ wandb_name = 'OdontoSeg_Reviewed'
 
 
 training_config = {
-  'experiment_name': 'vit_base_patch16_224_U-Net++',
-  'encoder' : 'vit_base_patch16_224',
-  'architecture': 'U-Net++',
+  'experiment_name': 'TransUNet',
+  'encoder' : '',
+  'architecture': 'TransUNet',
   'epochs': 200,
-  'batch_size': 2,
-  'val_batch_size': 2,
+  'batch_size': 4,
+  'val_batch_size': 4,
   'dataset_path' : '/home/fisch/Documents/OdontoSeg/datasets/Dataset_Imagens_Clinicas_V2.0',
   'loss_function' : 'dice',
   'optimizer': 'adamw',
@@ -20,7 +20,7 @@ training_config = {
   'classes': 4,
   'class_weigths': 
   [0.6471186223837316, 1.0, 2.613295558781593, 0.03166476775283598], # calculated by the inverse of pixels frequency
-  'library': 'torchseg',
+  'library': '',
   'encoder_depth': 4,
   'freeze_encoder': False,
   'need_wrapper': False,

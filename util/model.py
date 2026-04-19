@@ -1,3 +1,4 @@
+import numpy as np
 from typing import Optional
 import segmentation_models_pytorch as smp
 import torch
@@ -5,6 +6,8 @@ import torchseg
 import torch.nn as nn
 import torch.nn.functional as F
 from monai.networks.nets import UNETR, SwinUNETR
+from .vit_seg_modeling import VisionTransformer as ViT_seg
+from .vit_seg_modeling import CONFIGS as CONFIGS_ViT_seg
 #from Architecture.MyArchitecture.MyArchitecture import MyArchitecture
 #from Architecture.MyArchitecture_v2.MyArchitecture_v2 import MyArchitecture_v2
 #from Architecture.MyArchitecture_pvt_v2_b1__U_Net.MyArchitecture_pvt_v2_b1__U_Net import MyArchitecture_pvt_v2_b1__U_Net
@@ -14,66 +17,6 @@ from monai.networks.nets import UNETR, SwinUNETR
 #from transformers import AutoConfig, AutoModelForSemanticSegmentation
 #from transformers import EomtConfig, EomtForUniversalSegmentation
 #from timm.models.swin_transformer import swin_tiny_patch4_window7_224
-
-'''
-class SwinUNet(nn.Module):
-    def __init__(self, num_classes=4, in_channels=3, pretrained=True):
-        super().__init__()
-
-        self.encoder = swin_tiny_patch4_window7_224(pretrained=pretrained)
-
-        if in_channels != 3:
-            self.encoder.patch_embed.proj = nn.Conv2d(
-                in_channels, 96, kernel_size=4, stride=4
-            )
-
-        # Decoder
-        self.up1 = nn.ConvTranspose2d(768, 384, 2, stride=2)
-        self.up2 = nn.ConvTranspose2d(384, 192, 2, stride=2)
-        self.up3 = nn.ConvTranspose2d(192, 96, 2, stride=2)
-        self.up4 = nn.ConvTranspose2d(96, 96, 2, stride=2)
-
-        self.conv1 = nn.Conv2d(384, 384, 3, padding=1)
-        self.conv2 = nn.Conv2d(192, 192, 3, padding=1)
-        self.conv3 = nn.Conv2d(96, 96, 3, padding=1)
-
-        self.out = nn.Conv2d(96, num_classes, 1)
-
-    def forward(self, x):
-        # Interpolation
-        x = F.interpolate(x, size=(224, 224), mode='bilinear', align_corners=False)
-
-        # Encoder
-        x = self.encoder.patch_embed(x)
-
-        features = []
-        for layer in self.encoder.layers:
-            x = layer(x)
-            features.append(x)
-
-        # Extract multi-scale features
-        x1 = features[0].permute(0, 3, 1, 2)
-        x2 = features[1].permute(0, 3, 1, 2)
-        x3 = features[2].permute(0, 3, 1, 2)
-        x4 = features[3].permute(0, 3, 1, 2)
-        
-
-        # Decoder
-        d4 = self.up1(x4)
-        d4 = self.conv1(d4 + x3)
-
-        d3 = self.up2(d4)
-        d3 = self.conv2(d3 + x2)
-
-        d2 = self.up3(d3)
-        d2 = self.conv3(d2 + x1)
-
-        d1 = self.up4(d2)
-
-        y = F.interpolate(self.out(d1), size=(512, 512), mode='bilinear', align_corners=False)
-
-        return y
-'''
 
 
 class Wrapper(nn.Module):
@@ -104,12 +47,24 @@ def make_model(
 
     used_wrapper = False
 
-    if library == '':
 
-        if arch == 'Swin-UNet':
-            model = SwinUNet()
+    if library == '':
+        if arch == 'TransUNet':
+            print('TransUNet')
+
+            config_vit = CONFIGS_ViT_seg['R50-ViT-B_16']
+            config_vit.n_classes = 4
+            config_vit.n_skip = 3
+            config_vit.pretrained_path = '/home/fisch/Documents/OdontoSeg/vit_checkpoint/imagenet21k/R50+ViT-B_16.npz'
+            config_vit.patches.grid = (32, 32)
+
+
+            model = ViT_seg(config_vit, img_size=512, num_classes=classes).cuda()
+            model.load_from(weights=np.load(config_vit.pretrained_path))
+
 
             return model
+
 
     if library == 'monai':
         if arch == 'SwinUNETR':
