@@ -17,9 +17,6 @@ import ast
 
 def validate():
     torch.cuda.empty_cache()
-    #model_directory_path = 'models/swin_large_patch4_window7_224_U-Net'
-    #configs_file_name = 'config.txt'
-    #model_file_name = 'swin_large_patch4_window7_224_U-Net.pth'
 
     model_directory_path = validation_config['model_directory_path']
     configs_file_name = validation_config['configs_file_name']
@@ -34,7 +31,7 @@ def validate():
 
 
     # Initialize and load model
-     if training_config['library'] == 'smp':
+    if training_config['library'] == 'smp':
         model = make_model(training_config['encoder'], training_config['architecture'],
                             training_config['classes'], library='smp',
                             freeze_encoder=training_config['freeze_encoder'], need_wrapper=training_config['need_wrapper']).cuda()

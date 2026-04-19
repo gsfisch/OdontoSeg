@@ -11,7 +11,7 @@ test
 test_wrong_results_with_data_aug
 Odonto_dataset_npz
 inference
-config.py
+
 
 other_datasets
 datasets/
