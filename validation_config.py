@@ -33,7 +33,7 @@ validation_config = {
   #          },
   #'head_upsampling': 1,
 }
-
+ 
 path_models = '/home/fisch/Documents/OdontoSeg/models/'
 path_save_evaluation = '/home/fisch/Documents/OdontoSeg/experiments/comparison/'
 path_save_evaluation_percentage = '/home/fisch/Documents/OdontoSeg/experiments/comparison-percentage/'

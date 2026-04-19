@@ -22,7 +22,7 @@ def compute_metrics_from_confusion_matrix(conf_matrix, eps=1e-7):
     iou = TP / (TP + FP + FN + eps)
     dice = (2 * TP) / (2 * TP + FP + FN + eps)
 
-    # Means (include all classes, including background)
+    # Means values
     mean_precision = precision.mean().item()
     mean_recall = recall.mean().item()
     mIoU = iou.mean().item()
@@ -149,7 +149,7 @@ def train_loop(generator, optimizer, model, num_classes=4):
     #avg_metrics = {key: value / total_batches for key, value in running_metrics.items()}
 
 
-
+ 
 def val_loop(generator, model, num_classes=4):
     model.eval()
 

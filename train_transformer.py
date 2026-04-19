@@ -1,7 +1,7 @@
 import os
 os.environ['PYTORCH_CUDA_ALLOC_CONF'] = 'expandable_segments:True'
 import torch
-from test import test_routine
+#from test import test_routine
 from util.data import get_data_generators
 from util.model import make_model
 from loops import train_loop, val_loop
@@ -10,8 +10,6 @@ import wandb
 from datetime import datetime
 from config import training_config, wandb_config, wandb_name, path_models
 from util.scheduler import FlatplusAnneal, FlatplusAnnealTeste
-#from transformer_model import SegmentationModel
-#from model_src import SegmentationModel
 from torchinfo import summary
 import torchseg
 
@@ -39,8 +37,6 @@ def train():
     
 
     summary(model, input_size=(training_config['batch_size'], 3, 512, 512))
-    #print(dir(model.encoder))
-    #print(model.encoder._named_members)
 
     
     # get data generators

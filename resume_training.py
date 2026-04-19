@@ -10,7 +10,6 @@ import wandb
 from datetime import datetime
 from config import training_config, wandb_config, wandb_name, path_models
 from util.scheduler import FlatplusAnneal, FlatplusAnnealTeste
-#from transformer_model import SegmentationModel
 from model_src import SegmentationModel
 from torchinfo import summary
 import torchseg

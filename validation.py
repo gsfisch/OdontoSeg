@@ -42,24 +42,7 @@ def validate():
                        decoder_channels=training_config['decoder_channels'], encoder_depth=training_config['encoder_depth'],
                        encoder_params=training_config['encoder_params'], head_upsampling=training_config['head_upsampling'],
                        freeze_encoder=training_config['freeze_encoder'], need_wrapper=training_config['need_wrapper']).cuda()
-    '''
-    model = make_model(training_config['encoder'], training_config['architecture'], 
-        classes=training_config['classes'], library=training_config['library'],
-        decoder_channels=training_config['decoder_channels'], encoder_depth=training_config['encoder_depth'],
-        encoder_params=training_config['encoder_params'], head_upsampling=training_config['head_upsampling']).cuda()
 
-    model = make_model(
-    training_config['encoder'],
-    training_config['architecture'],
-    training_config['classes'],
-    library='smp',
-    #encoder_depth=0,
-    #decoder_channels=(),
-    #encoder_params={},
-    #head_upsampling=2,
-    )    
-    model = model.to(device)
-    '''
     
     model.load_state_dict(torch.load(os.path.join(model_directory_path, model_file_name), weights_only="True"))
 
@@ -82,7 +65,6 @@ def validate():
                 f'val_precision: {metrics_val["precision"]:.4f}\n' +
                 f'val_recall: {metrics_val["recall"]:.4f}\n'
             )
-
 
 
 if __name__ == "__main__":

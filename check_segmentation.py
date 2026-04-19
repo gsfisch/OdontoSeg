@@ -18,7 +18,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 '''
-# Blend image with its mask
+# Blend image with its mask 
 def blendImage(original_path, image_path):
     original_img = cv2.imread(original_path)
     mask  = cv2.imread(image_path)

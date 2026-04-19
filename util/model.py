@@ -16,7 +16,7 @@ from .vit_seg_modeling import CONFIGS as CONFIGS_ViT_seg
 #from transformers import EomtForUniversalSegmentation, EomtImageProcessor
 #from transformers import AutoConfig, AutoModelForSemanticSegmentation
 #from transformers import EomtConfig, EomtForUniversalSegmentation
-#from timm.models.swin_transformer import swin_tiny_patch4_window7_224
+#from timm.models.swin_transformer import swin_tiny_patch4_window7_224 
 
 
 class Wrapper(nn.Module):

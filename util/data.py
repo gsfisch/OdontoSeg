@@ -7,7 +7,7 @@ from util.unet_dataset import UNET_Dataset
 
 def load_images_from_folder(folder: str) -> Tuple[List[str], List[str]]:
     """
-    Loads image and mask file paths from the given folder.
+    Loads image and mask file paths from the given folder. 
 
     Args:
         folder (str): Path to the dataset folder.

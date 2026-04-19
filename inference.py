@@ -97,7 +97,7 @@ def main():
     model.load_state_dict(torch.load(os.path.join(model_directory_path, model_file_name), weights_only="True"))
     model.eval()
 
-    #summary(model, input_size=(training_config['batch_size'], 3, 512, 512))
+    #summary(model, input_size=(training_config['batch_size'], 3, 512, 512)) 
 
 
     # Inference
@@ -136,8 +136,8 @@ def main():
 
             # Save images
             os.makedirs(inference_directory_path, exist_ok=True)
-            imageio.imwrite(os.path.join(inference_directory_path, f"masks_{image_name}.png"), masks_image.astype(np.uint8) * 255)
-            imageio.imwrite(os.path.join(inference_directory_path, f"image_{image_name}.png"), (original_image * 255).astype(np.uint8))
+            #imageio.imwrite(os.path.join(inference_directory_path, f"masks_{image_name}.png"), masks_image.astype(np.uint8) * 255)
+            #imageio.imwrite(os.path.join(inference_directory_path, f"image_{image_name}.png"), (original_image * 255).astype(np.uint8))
             imageio.imwrite(os.path.join(inference_directory_path, f"{image_name}.png"), (segmented_image * 255).astype(np.uint8))
 
         print(f"\nInference saved at: {inference_directory_path}")
