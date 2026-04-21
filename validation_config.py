@@ -5,33 +5,10 @@ import torch
 wandb_name = 'OdontoSeg'
 
 validation_config = {
-  'model_directory_path': 'models/TransUNet',
+  'model_directory_path': 'models/caformer_b36_MAnet',
   'configs_file_name': 'config.txt',
-  'model_file_name': 'TransUNet.pth',
-  #'epochs': 200,
-  #'batch_size': 1,
-  #'val_batch_size': 1,
-  #'delay_per_batch': 1,
+  'model_file_name': 'caformer_b36_MAnet.pth',
   'dataset_path' : '/home/fisch/Documents/OdontoSeg/datasets/Dataset_Imagens_Clinicas_V2.0',
-  #'loss_function' : 'dice',
-  #'optimizer': 'adamw',
-  #'scheduler_step_size': 0.8,
-  #'learning_rate': 1e-4,
-  #'weight_decay' : 1e-4,
-  #'classes': 4,
-  #'class_weigths': 
-  #[0.6471186223837316, 1.0, 2.613295558781593, 0.03166476775283598], # calculated by the inverse of pixels frequency
-  #'library': 'torchseg', # smp and torchseg for now
-  'library': '',
-  #'encoder_depth': 4,
-  #'decoder_channels': (256, 128, 64, 32),
-  #'encoder_params': {
-  #              'img_size': 512,
-  #              "scale_factors": (8, 4, 2, 1),
-                #"scale_factors": (16, 8, 4, 2),
-                #"scale_factors": (4, 2, 1, 0.5),
-  #          },
-  #'head_upsampling': 1,
 }
  
 path_models = '/home/fisch/Documents/OdontoSeg/models/'

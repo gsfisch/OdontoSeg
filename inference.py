@@ -47,27 +47,27 @@ def mask_to_class(final_output):
 
 
 def main():
-    model_directory_path = "models/swin_large_patch4_window7_224_MAnet"
-    model_directory_path = "models/TransUNet"                         
+    model_name = 'TransUNet'
+    model_directory_path = f"models/{model_name}"                         
     '''
-    image_names = [  'carcinoma_37', 'carcinoma_31547_2',       
+    images_path = [  'carcinoma_37', 'carcinoma_31547_2',       
                     'leucoplasia_10', 'leucoplasia_N-103',                  # Choose images
                     'ploliferativas_IMG_2088', 'ploliferativas_IMG_2089'
     ]
 
-    image_names = [  'carcinoma_31227_1', #'',       
+    images_path = [  'carcinoma_31227_1', #'',       
                     'leucoplasia_40', #'',                  
                     'ploliferativas_IMG_9914', #''
     ]
 
-    image_names = [
+    images_path = [
         'ploliferativas_hiperplasia epitelial'
     ]
     '''
 
     split = 'test'
     dataset_name = 'Dataset_Imagens_Clinicas_V2.0' 
-    image_names = f"./datasets/{dataset_name}/{split}/images/"
+    images_path = f"./datasets/{dataset_name}/{split}/images/"
     inference_directory_path = os.path.join("./inference/", model_directory_path[7:]) #, datetime.now().strftime("%Y-%m-%d_%H:%M:%S.%f")[:-3])
     inference_directory_path = os.path.join("./inference/", model_directory_path[7:]) 
     configs_file_name = "config.txt"
@@ -104,8 +104,8 @@ def main():
     with torch.no_grad():
         softmax = nn.Softmax(dim=1).cuda()
 
-        for image_name in os.listdir(image_names):
-            print(f'{image_name}=')
+        for image_name in os.listdir(images_path):
+            print(f'{image_name=}')
             image_path = f"./datasets/{dataset_name}/{split}/images/" + image_name
             mask_path = f"./datasets/{dataset_name}/{split}/masks/" + image_name
 
@@ -136,9 +136,9 @@ def main():
 
             # Save images
             os.makedirs(inference_directory_path, exist_ok=True)
-            #imageio.imwrite(os.path.join(inference_directory_path, f"masks_{image_name}.png"), masks_image.astype(np.uint8) * 255)
+            imageio.imwrite(os.path.join(inference_directory_path, f"{image_name[:-4]}_mask_{model_name}.png"), masks_image.astype(np.uint8) * 255)
             #imageio.imwrite(os.path.join(inference_directory_path, f"image_{image_name}.png"), (original_image * 255).astype(np.uint8))
-            imageio.imwrite(os.path.join(inference_directory_path, f"{image_name}.png"), (segmented_image * 255).astype(np.uint8))
+            imageio.imwrite(os.path.join(inference_directory_path, f"{image_name[:-4]}_seg_{model_name}.png"), (segmented_image * 255).astype(np.uint8))
 
         print(f"\nInference saved at: {inference_directory_path}")
             

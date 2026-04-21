@@ -5,12 +5,12 @@ wandb_name = 'OdontoSeg_Reviewed'
 
 
 training_config = {
-  'experiment_name': 'TransUNet',
-  'encoder' : '',
-  'architecture': 'TransUNet',
+  'experiment_name': 'caformer_b36_FPN',
+  'encoder' : 'caformer_b36',
+  'architecture': 'FPN',
   'epochs': 200,
-  'batch_size': 4,
-  'val_batch_size': 4,
+  'batch_size': 3,
+  'val_batch_size': 3,
   'dataset_path' : '/home/fisch/Documents/OdontoSeg/datasets/Dataset_Imagens_Clinicas_V2.0',
   'loss_function' : 'dice',
   'optimizer': 'adamw',
@@ -20,10 +20,10 @@ training_config = {
   'classes': 4,
   'class_weigths': 
   [0.6471186223837316, 1.0, 2.613295558781593, 0.03166476775283598], # calculated by the inverse of pixels frequency
-  'library': '',
+  'library': 'torchseg',
   'encoder_depth': 4,
   'freeze_encoder': False,
-  'need_wrapper': False,
+  'need_wrapper': True,
   'decoder_channels': (256, 128, 64, 32),
   'encoder_params': {
                 'img_size': 512,

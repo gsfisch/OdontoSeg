@@ -20,8 +20,8 @@ def validate():
 
     model_directory_path = validation_config['model_directory_path']
     configs_file_name = validation_config['configs_file_name']
-    device = torch.device('cuda')
     model_file_name = validation_config['model_file_name']
+    device = torch.device('cuda')
 
 
     # Read training configurations
