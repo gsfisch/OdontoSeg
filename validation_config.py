@@ -5,34 +5,34 @@ import torch
 wandb_name = 'OdontoSeg'
 
 validation_config = {
-  'model_directory_path': 'models/efficientnet-b6_FPN',
+  'model_directory_path': 'models/vit_large_patch16_224_MAnet',
   'configs_file_name': 'config.txt',
-  'model_file_name': 'efficientnet-b6_FPN.pth',
-  'epochs': 200,
+  'model_file_name': 'vit_large_patch16_224_MAnet.pth',
+  'dataset_path' : '/home/fisch/Documents/OdontoSeg/datasets/Dataset_Imagens_Clinicas_V2.0',
+  #'epochs': 200,
    #'batch_size': 1,
    #'val_batch_size': 1,
-  'delay_per_batch': 1,
-  'dataset_path' : '/home/fisch/Documents/OdontoSeg/dataset',
+  #'delay_per_batch': 1,
   #'dataset_path' : '/home/fisch/Documents/OdontoSeg/dataset_sri_lanka',
-  'loss_function' : 'dice',
-  'optimizer': 'adamw',
-  'scheduler_step_size': 0.8,
-  'learning_rate': 1e-4,
-  'weight_decay' : 1e-4,
-  'classes': 4,
-  'class_weigths': 
-  [0.6471186223837316, 1.0, 2.613295558781593, 0.03166476775283598], # calculated by the inverse of pixels frequency
+  #'loss_function' : 'dice',
+  #'optimizer': 'adamw',
+  #'scheduler_step_size': 0.8,
+  #'learning_rate': 1e-4,
+  #'weight_decay' : 1e-4,
+  #'classes': 4,
+  #'class_weigths': 
+  #[0.6471186223837316, 1.0, 2.613295558781593, 0.03166476775283598], # calculated by the inverse of pixels frequency
   #'library': 'torchseg', # smp and torchseg for now
-  'library': 'smp',
-  'encoder_depth': 4,
-  'decoder_channels': (256, 128, 64, 32),
-  'encoder_params': {
-                'img_size': 512,
-                "scale_factors": (8, 4, 2, 1),
+  #'library': 'smp',
+  #'encoder_depth': 4,
+  #'decoder_channels': (256, 128, 64, 32),
+  #'encoder_params': {
+  #              'img_size': 512,
+  #              "scale_factors": (8, 4, 2, 1),
                 #"scale_factors": (16, 8, 4, 2),
                 #"scale_factors": (4, 2, 1, 0.5),
-            },
-  'head_upsampling': 1,
+  #          },
+  #'head_upsampling': 1,
 }
 
 path_models = '/home/fisch/Documents/OdontoSeg/models/'

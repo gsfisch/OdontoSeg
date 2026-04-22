@@ -12,6 +12,9 @@ from skimage import transform
 from datetime import datetime
 import numpy as np
 import imageio.v2 as imageio
+import time
+
+
 
 
 class_colors_list = {
@@ -47,8 +50,10 @@ def mask_to_class(final_output):
 
 
 def main():
-    model_directory_path = "models/swin_large_patch4_window7_224_MAnet"
-    model_directory_path = "models/resnet34_FPN"                         
+    model_name = 'vit_large_patch16_224_MAnet'
+    dataset_name = 'Dataset_Imagens_Clinicas_V2.0'
+    model_directory_path = f"models/{model_name}"    
+
     '''
     image_names = [  'carcinoma_37', 'carcinoma_31547_2',       
                     'leucoplasia_10', 'leucoplasia_N-103',                  # Choose images
@@ -66,7 +71,7 @@ def main():
     '''
 
     set_used = 'test'
-    image_names = f"./dataset/{set_used}/images/"
+    images_path = f"./datasets/{dataset_name}/{set_used}/images/"
     inference_directory_path = os.path.join("./inference/", model_directory_path[7:]) #, datetime.now().strftime("%Y-%m-%d_%H:%M:%S.%f")[:-3])
     inference_directory_path = os.path.join("./inference/teste/", model_directory_path[7:]) 
     configs_file_name = "config.txt"
@@ -80,7 +85,7 @@ def main():
 
 
     # Initialize and load model
-     if training_config['library'] == 'smp':
+    if training_config['library'] == 'smp':
         model = make_model(training_config['encoder'], training_config['architecture'],
                             training_config['classes'], library='smp',
                             freeze_encoder=training_config['freeze_encoder'], need_wrapper=training_config['need_wrapper']).cuda()
@@ -92,43 +97,33 @@ def main():
                        encoder_params=training_config['encoder_params'], head_upsampling=training_config['head_upsampling'],
                        freeze_encoder=training_config['freeze_encoder'], need_wrapper=training_config['need_wrapper']).cuda()
 
-    '''
-    if training_config['library'] == 'smp':
-        model = make_model(
-                training_config['encoder'],
-                training_config['architecture'],
-                training_config['classes'],
-                library=training_config['library'],
-                ).cuda() 
-
-    else: 
-        model = make_model(training_config['encoder'], training_config['architecture'], 
-            classes=training_config['classes'], library=training_config['library'],
-            decoder_channels=training_config['decoder_channels'], encoder_depth=training_config['encoder_depth'],
-            encoder_params=training_config['encoder_params'], head_upsampling=training_config['head_upsampling']).cuda()
-    '''
 
     model.load_state_dict(torch.load(os.path.join(model_directory_path, model_file_name), weights_only="True"))
     model.eval()
 
     #summary(model, input_size=(training_config['batch_size'], 3, 512, 512))
 
+    accumulative_elapsed_time = 0.0
 
     # Inference
     with torch.no_grad():
         softmax = nn.Softmax(dim=1).cuda()
 
-        for image_name in os.listdir(image_names):
+        for image_name in os.listdir(images_path):
             print(f'{image_name}=')
-            image_path = f"./dataset/{set_used}/images/" + image_name # + '.png'
-            mask_path = f"./dataset/{set_used}/masks/" + image_name  # + '.png' 
+            image_path = f"./datasets/{dataset_name}/{set_used}/images/" + image_name # + '.png'
+            mask_path = f"./datasets/{dataset_name}/{set_used}/masks/" + image_name  # + '.png' 
 
             print(image_path)
 
             original_image = imread(image_path).astype(np.float32) / 255.0
 
 
+            start = time.perf_counter()
             logits = model(prepare_img(original_image))    # Output Shape: (B, C ,H ,W) -> (1, 4, 512, 512)
+            #end = time.perf_counter()
+            #print(f"Elapsed time: {end - start:.6f} seconds\n")
+
             output = softmax(logits)
             predicted = torch.argmax(output, dim=1)
             masks_image = mask_to_class(predicted[0])
@@ -152,15 +147,21 @@ def main():
 
             # segmented_image = 0.8*transform.resize(original_image, (512, 512), anti_aliasing=True) + 0.2*masks_image
 
+            end = time.perf_counter()
+            elapsed_time = end - start
+            accumulative_elapsed_time += elapsed_time
+            print(f"Elapsed time: {elapsed_time:.6f} seconds\n")
 
             # Save images
             os.makedirs(inference_directory_path, exist_ok=True)
-            #imageio.imwrite(os.path.join(inference_directory_path, f"masks_{image_name}.png"), masks_image.astype(np.uint8) * 255)
+            imageio.imwrite(os.path.join(inference_directory_path, f"{image_name[:-4]}_mask_{model_name}.png"), masks_image.astype(np.uint8) * 255)
             #imageio.imwrite(os.path.join(inference_directory_path, f"image_{image_name}.png"), (original_image * 255).astype(np.uint8))
-            imageio.imwrite(os.path.join(inference_directory_path, f"{image_name}.png"), (segmented_image * 255).astype(np.uint8))
+            imageio.imwrite(os.path.join(inference_directory_path, f"{image_name[:-4]}_seg_{model_name}.png"), (segmented_image * 255).astype(np.uint8))
 
         print(f"\nInference saved at: {inference_directory_path}")
-            
+        mean_elapsed_time = accumulative_elapsed_time / 115.0
+        print(f"Mean elapsed time: {mean_elapsed_time:.6f} seconds\n")
+         
 
 if __name__ == "__main__":
     main()

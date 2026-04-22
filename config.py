@@ -5,12 +5,12 @@ wandb_name = 'OdontoSeg_Reviewed'
 
 
 training_config = {
-  'experiment_name': 'vit_base_patch16_224_U-Net++',
-  'encoder' : 'vit_base_patch16_224',
-  'architecture': 'U-Net++',
+  'experiment_name': 'vit_large_patch16_224_U-Net',
+  'encoder' : 'vit_large_patch16_224',
+  'architecture': 'U-Net',
   'epochs': 200,
-  'batch_size': 2,
-  'val_batch_size': 2,
+  'batch_size': 3,
+  'val_batch_size': 3,
   'dataset_path' : '/home/fisch/Documents/OdontoSeg/datasets/Dataset_Imagens_Clinicas_V2.0',
   'loss_function' : 'dice',
   'optimizer': 'adamw',
