@@ -26,6 +26,7 @@ def train():
     if training_config['library'] == 'smp':
         model = make_model(training_config['encoder'], training_config['architecture'],
                             training_config['classes'], library='smp',
+                            decoder_channels=training_config['decoder_channels'], encoder_depth=training_config['encoder_depth'],
                             freeze_encoder=training_config['freeze_encoder'], need_wrapper=training_config['need_wrapper']).cuda()
 
     else:    
@@ -84,7 +85,7 @@ def train():
         '''
 
         # Train
-        metrics_train = (training_generator, opt, model)
+        metrics_train = train_loop(training_generator, opt, model)
 
         # Validate
         metrics_val = val_loop(valid_generator, model)

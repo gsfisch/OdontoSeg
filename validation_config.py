@@ -5,9 +5,9 @@ import torch
 wandb_name = 'OdontoSeg'
 
 validation_config = {
-  'model_directory_path': 'models/caformer_b36_MAnet',
+  'model_directory_path': 'models/SwinUNETR',
   'configs_file_name': 'config.txt',
-  'model_file_name': 'caformer_b36_MAnet.pth',
+  'model_file_name': 'SwinUNETR.pth',
   'dataset_path' : '/home/fisch/Documents/OdontoSeg/datasets/Dataset_Imagens_Clinicas_V2.0',
 }
  

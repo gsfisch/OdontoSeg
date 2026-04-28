@@ -8,6 +8,7 @@ import torch.nn.functional as F
 from monai.networks.nets import UNETR, SwinUNETR
 from .vit_seg_modeling import VisionTransformer as ViT_seg
 from .vit_seg_modeling import CONFIGS as CONFIGS_ViT_seg
+from .medformer import MedFormer
 #from Architecture.MyArchitecture.MyArchitecture import MyArchitecture
 #from Architecture.MyArchitecture_v2.MyArchitecture_v2 import MyArchitecture_v2
 #from Architecture.MyArchitecture_pvt_v2_b1__U_Net.MyArchitecture_pvt_v2_b1__U_Net import MyArchitecture_pvt_v2_b1__U_Net
@@ -65,6 +66,11 @@ def make_model(
 
             return model
 
+        elif arch == 'MedFormer':
+            model = MedFormer(in_chan=3, num_classes=4)
+
+            return model
+
 
     if library == 'monai':
         if arch == 'SwinUNETR':
@@ -72,9 +78,10 @@ def make_model(
             model = SwinUNETR(
                 in_channels=3,
                 out_channels=4,
+                num_heads=(3,6,12,24),
                 spatial_dims=2,
-                feature_size=36,
-                use_checkpoint=True
+                feature_size=48,
+                #use_checkpoint=True
             )
 
             return model
@@ -86,14 +93,12 @@ def make_model(
                 out_channels=4,
                 spatial_dims=2,
                 img_size=(512, 512),
-                feature_size=16,
+                feature_size=64,    # 16 before
                 hidden_size=768,
                 mlp_dim=3072,
                 num_heads=12,
-                #pos_embed="perceptron",
                 norm_name="instance",
                 res_block=True,
-                dropout_rate=0.1,
             )
             
 
@@ -187,28 +192,30 @@ def make_model(
             model = smp.Unet(
                 encoder_name=encoder,
                 classes=classes,
-                # activation="softmax" if classes > 1 else "sigmoid",
+                decoder_channels=decoder_channels,
+                encoder_depth=encoder_depth,
                 encoder_weights="imagenet",
             )
         elif arch == "Linknet":
             model = smp.Linknet(
                 encoder_name=encoder,
                 classes=classes,
+                decoder_channels=decoder_channels,
+                encoder_depth= encoder_depth,
                 encoder_weights="imagenet",
-                encoder_depth= 5,
-                decoder_use_batchnorm= True
+                #decoder_use_batchnorm= True
             )
         elif arch == "FPN":
             model = smp.FPN(
                 encoder_name=encoder,
                 classes=classes,
-                #activation="softmax" if classes > 1 else "sigmoid",
+                decoder_channels=decoder_channels,
                 encoder_weights="imagenet",
-                encoder_depth  = 5,
+                encoder_depth  = encoder_depth,
                 decoder_pyramid_channels = 256,
                 decoder_segmentation_channels = 128,
                 decoder_merge_policy = "add",
-                decoder_dropout = 0.2,
+                #decoder_dropout = 0.2,
                 upsampling = 4
             )
         elif arch == "PSPNet":

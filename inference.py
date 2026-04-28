@@ -12,6 +12,7 @@ from skimage import transform
 from datetime import datetime
 import numpy as np
 import imageio.v2 as imageio
+import time
 
 
 class_colors_list = {
@@ -47,7 +48,7 @@ def mask_to_class(final_output):
 
 
 def main():
-    model_name = 'TransUNet'
+    model_name = 'SwinUNETR'
     model_directory_path = f"models/{model_name}"                         
     '''
     images_path = [  'carcinoma_37', 'carcinoma_31547_2',       
@@ -99,7 +100,7 @@ def main():
 
     #summary(model, input_size=(training_config['batch_size'], 3, 512, 512)) 
 
-
+    cumulative_elapsed_time = 0.0
     # Inference
     with torch.no_grad():
         softmax = nn.Softmax(dim=1).cuda()
@@ -112,7 +113,7 @@ def main():
 
             original_image = imread(image_path).astype(np.float32) / 255.0
 
-
+            start = time.perf_counter()
             logits = model(prepare_img(original_image))    # Output Shape: (B, C ,H ,W) -> (1, 4, 512, 512)
             output = softmax(logits)
             predicted = torch.argmax(output, dim=1)
@@ -133,6 +134,10 @@ def main():
 
             # segmented_image = 0.8*transform.resize(original_image, (512, 512), anti_aliasing=True) + 0.2*masks_image
 
+            end = time.perf_counter()
+            elapsed_time = end - start
+            cumulative_elapsed_time += elapsed_time
+            print(f"Elapsed time: {elapsed_time:.6f} seconds")
 
             # Save images
             os.makedirs(inference_directory_path, exist_ok=True)
@@ -141,6 +146,10 @@ def main():
             imageio.imwrite(os.path.join(inference_directory_path, f"{image_name[:-4]}_seg_{model_name}.png"), (segmented_image * 255).astype(np.uint8))
 
         print(f"\nInference saved at: {inference_directory_path}")
+
+        mean_elapsed_time = cumulative_elapsed_time / 115.0
+        print(f"Mean Elapsed time: {mean_elapsed_time:.6f} seconds")
+
             
 
 if __name__ == "__main__":
