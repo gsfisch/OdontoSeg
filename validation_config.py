@@ -5,9 +5,9 @@ import torch
 wandb_name = 'OdontoSeg'
 
 validation_config = {
-  'model_directory_path': 'models/SwinUNETR',
+  'model_directory_path': 'models/resnet101_U-Net',
   'configs_file_name': 'config.txt',
-  'model_file_name': 'SwinUNETR.pth',
+  'model_file_name': 'resnet101_U-Net.pth',
   'dataset_path' : '/home/fisch/Documents/OdontoSeg/datasets/Dataset_Imagens_Clinicas_V2.0',
 }
  

@@ -48,7 +48,7 @@ def mask_to_class(final_output):
 
 
 def main():
-    model_name = 'SwinUNETR'
+    model_name = 'resnet101_U-Net'
     model_directory_path = f"models/{model_name}"                         
     '''
     images_path = [  'carcinoma_37', 'carcinoma_31547_2',       
@@ -85,6 +85,7 @@ def main():
     if training_config['library'] == 'smp':
         model = make_model(training_config['encoder'], training_config['architecture'],
                             training_config['classes'], library='smp',
+                            decoder_channels=training_config['decoder_channels'], encoder_depth=training_config['encoder_depth'],
                             freeze_encoder=training_config['freeze_encoder'], need_wrapper=training_config['need_wrapper']).cuda()
 
     else:    

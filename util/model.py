@@ -216,7 +216,7 @@ def make_model(
                 decoder_segmentation_channels = 128,
                 decoder_merge_policy = "add",
                 #decoder_dropout = 0.2,
-                upsampling = 4
+                upsampling = 2
             )
         elif arch == "PSPNet":
             model = smp.PSPNet(

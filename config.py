@@ -5,9 +5,9 @@ wandb_name = 'OdontoSeg_Reviewed'
 
 
 training_config = {
-  'experiment_name': 'resnet101_U-Net',
+  'experiment_name': 'resnet101_FPN',
   'encoder' : 'resnet101',
-  'architecture': 'U-Net',
+  'architecture': 'FPN',
   'epochs': 200,
   'batch_size': 4,
   'val_batch_size': 4,
@@ -23,7 +23,7 @@ training_config = {
   'library': 'smp',
   'encoder_depth': 4,
   'freeze_encoder': False,
-  'need_wrapper': False,
+  'need_wrapper': True,
   'decoder_channels': (256, 128, 64, 32),
   'encoder_params': {
                 'img_size': 512,

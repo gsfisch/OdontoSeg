@@ -34,6 +34,7 @@ def validate():
     if training_config['library'] == 'smp':
         model = make_model(training_config['encoder'], training_config['architecture'],
                             training_config['classes'], library='smp',
+                            decoder_channels=training_config['decoder_channels'], encoder_depth=training_config['encoder_depth'],
                             freeze_encoder=training_config['freeze_encoder'], need_wrapper=training_config['need_wrapper']).cuda()
 
     else:    
@@ -54,7 +55,7 @@ def validate():
     with torch.no_grad():
 
         # Validate
-        metrics_val = val_loop(test_generator, model)
+        metrics_val = val_loop(valid_generator, model)
 
 
         # Print and log results
