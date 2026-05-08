@@ -60,7 +60,7 @@ def fix_colours(masks_image):
 
 
 def main():
-    model_name = 'inceptionv4_FPN'
+    model_name = 'efficientnet-b6_Linknet'
     model_directory_path = f"models/{model_name}"                         
     '''
     images_path = [  'carcinoma_37', 'carcinoma_31547_2',       
