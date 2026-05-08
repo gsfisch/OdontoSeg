@@ -38,7 +38,7 @@ def make_model(
     arch: str,
     classes: Optional[int] = 3,
     library='smp',
-    encoder_depth=0,
+    encoder_depth=4,
     decoder_channels=(),
     encoder_params={},
     freeze_encoder = False,
@@ -203,7 +203,6 @@ def make_model(
                 decoder_channels=decoder_channels,
                 encoder_depth= encoder_depth,
                 encoder_weights="imagenet",
-                #decoder_use_batchnorm= True
             )
         elif arch == "FPN":
             model = smp.FPN(
@@ -215,14 +214,12 @@ def make_model(
                 decoder_pyramid_channels = 256,
                 decoder_segmentation_channels = 128,
                 decoder_merge_policy = "add",
-                #decoder_dropout = 0.2,
                 upsampling = 2
             )
         elif arch == "PSPNet":
             model = smp.PSPNet(
                 encoder_name=encoder,
                 classes=classes,
-                activation="softmax" if classes > 1 else "sigmoid",
                 encoder_weights="imagenet",
                 encoder_depth = 3,
                 psp_out_channels = 512,
