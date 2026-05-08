@@ -13,6 +13,7 @@ from datetime import datetime
 import numpy as np
 import imageio.v2 as imageio
 import time
+import matplotlib.pyplot as plt
 
 
 class_colors_list = {
@@ -47,8 +48,19 @@ def mask_to_class(final_output):
     return result.cpu().numpy()
 
 
+def fix_colours(masks_image):
+    mask_is_green = np.all(masks_image == [0, 1, 0], axis=-1)
+    mask_is_yellow = np.all(masks_image == [1, 1, 0], axis=-1)
+
+    masks_image[mask_is_green] = [1, 1, 0]
+    masks_image[mask_is_yellow] = [0, 1, 0]
+
+    return masks_image
+
+
+
 def main():
-    model_name = 'resnet101_U-Net'
+    model_name = 'inceptionv4_FPN'
     model_directory_path = f"models/{model_name}"                         
     '''
     images_path = [  'carcinoma_37', 'carcinoma_31547_2',       
@@ -56,7 +68,7 @@ def main():
                     'ploliferativas_IMG_2088', 'ploliferativas_IMG_2089'
     ]
 
-    images_path = [  'carcinoma_31227_1', #'',       
+    images_path = [  'carcinoma_31227_1', #'',
                     'leucoplasia_40', #'',                  
                     'ploliferativas_IMG_9914', #''
     ]
@@ -120,9 +132,16 @@ def main():
             predicted = torch.argmax(output, dim=1)
             masks_image = mask_to_class(predicted[0])
 
+            
+
             resized = transform.resize(original_image, (512, 512), anti_aliasing=True)
 
-                
+            # Fix colours
+            masks_image_fixed_colours = fix_colours(masks_image)
+
+            #plt.imshow(masks_image_fixed_colours)
+            #plt.show()
+
             background = (masks_image[:, :, 2] > 0.8) & \
                             (masks_image[:, :, 0] < 0.2) & \
                             (masks_image[:, :, 1] < 0.2)
@@ -130,10 +149,11 @@ def main():
             alpha = (~background).astype(float)
             alpha = alpha[:, :, None]
 
-            # Blend
-            segmented_image = resized * (1 - 0.3 * alpha) + masks_image * (0.3 * alpha)
 
-            # segmented_image = 0.8*transform.resize(original_image, (512, 512), anti_aliasing=True) + 0.2*masks_image
+            # Blend
+            segmented_image = resized * (1 - 0.3 * alpha) + masks_image_fixed_colours * (0.3 * alpha)
+
+            # segmented_image = 0.8*transform.resize(original_image, (512, 512), anti_aliasing=True) + 0.2*masks_image_fixed_colours
 
             end = time.perf_counter()
             elapsed_time = end - start
@@ -142,7 +162,7 @@ def main():
 
             # Save images
             os.makedirs(inference_directory_path, exist_ok=True)
-            imageio.imwrite(os.path.join(inference_directory_path, f"{image_name[:-4]}_mask_{model_name}.png"), masks_image.astype(np.uint8) * 255)
+            imageio.imwrite(os.path.join(inference_directory_path, f"{image_name[:-4]}_mask_{model_name}.png"), masks_image_fixed_colours.astype(np.uint8) * 255)
             #imageio.imwrite(os.path.join(inference_directory_path, f"image_{image_name}.png"), (original_image * 255).astype(np.uint8))
             imageio.imwrite(os.path.join(inference_directory_path, f"{image_name[:-4]}_seg_{model_name}.png"), (segmented_image * 255).astype(np.uint8))
 

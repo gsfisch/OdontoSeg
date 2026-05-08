@@ -5,15 +5,15 @@ wandb_name = 'OdontoSeg_Reviewed'
 
 
 training_config = {
-  'experiment_name': 'resnet101_FPN',
+  'experiment_name': 'resnet101_FPN_batch8_rangerlars',
   'encoder' : 'resnet101',
   'architecture': 'FPN',
   'epochs': 200,
-  'batch_size': 4,
-  'val_batch_size': 4,
+  'batch_size': 8,
+  'val_batch_size': 8,
   'dataset_path' : '/home/fisch/Documents/OdontoSeg/datasets/Dataset_Imagens_Clinicas_V2.0',
   'loss_function' : 'dice',
-  'optimizer': 'adamw',
+  'optimizer': 'rangerlars',
   'scheduler_step_size': 0.8,
   'learning_rate': 1e-4,
   'weight_decay' : 1e-4,
@@ -23,7 +23,7 @@ training_config = {
   'library': 'smp',
   'encoder_depth': 4,
   'freeze_encoder': False,
-  'need_wrapper': True,
+  'need_wrapper': False,
   'decoder_channels': (256, 128, 64, 32),
   'encoder_params': {
                 'img_size': 512,
@@ -59,3 +59,158 @@ classes_color_float = [
   torch.FloatTensor([[[255, 255, 0]]]), # proliferativas
   torch.FloatTensor([[[0, 0, 255]]])    # background
 ]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+

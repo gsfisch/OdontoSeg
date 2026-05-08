@@ -55,7 +55,7 @@ def validate():
     with torch.no_grad():
 
         # Validate
-        metrics_val = val_loop(valid_generator, model)
+        metrics_val = val_loop(test_generator, model)
 
 
         # Print and log results
