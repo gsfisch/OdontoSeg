@@ -70,7 +70,7 @@ def create_data_loader(dataset: UNET_Dataset, batch_size: int, shuffle: bool, nu
     """
     return torch.utils.data.DataLoader(dataset=dataset, batch_size=batch_size, shuffle=shuffle, num_workers=num_workers)
 
-def get_data_generators(batch_size=training_config['batch_size']) -> Tuple[torch.utils.data.DataLoader, torch.utils.data.DataLoader]:
+def get_data_generators(batch_size=training_config['batch_size'], dataset_path=training_config['dataset_path']) -> Tuple[torch.utils.data.DataLoader, torch.utils.data.DataLoader]:
     """
     Prepares training and validation DataLoaders.
 
@@ -78,7 +78,7 @@ def get_data_generators(batch_size=training_config['batch_size']) -> Tuple[torch
         Tuple[torch.utils.data.DataLoader, torch.utils.data.DataLoader]:
             Training and validation DataLoaders.
     """
-    dataset_path = training_config['dataset_path']
+    #dataset_path = training_config['dataset_path']
     #batch_size = training_config['batch_size']
     val_batch_size = batch_size #training_config['val_batch_size']
 

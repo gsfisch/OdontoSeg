@@ -60,7 +60,7 @@ def fix_colours(masks_image):
 
 
 def main():
-    model_name = 'inceptionv4_FPN'
+    model_name = 'SegFormer_mit_b3'
     model_directory_path = f"models/{model_name}"                         
     '''
     images_path = [  'carcinoma_37', 'carcinoma_31547_2',       
@@ -79,10 +79,10 @@ def main():
     '''
 
     split = 'test'
-    dataset_name = 'Dataset_Imagens_Clinicas_V2.0' 
+    dataset_name = 'dataset_sri_lanka_no_healthy' 
     images_path = f"./datasets/{dataset_name}/{split}/images/"
     inference_directory_path = os.path.join("./inference/", model_directory_path[7:]) #, datetime.now().strftime("%Y-%m-%d_%H:%M:%S.%f")[:-3])
-    inference_directory_path = os.path.join("./inference/", model_directory_path[7:]) 
+    inference_directory_path = os.path.join("./inference/dataset_sri_lanka/", model_directory_path[7:]) 
     configs_file_name = "config.txt"
     model_file_name = model_directory_path[7:] + ".pth"
 
@@ -111,7 +111,7 @@ def main():
     model.load_state_dict(torch.load(os.path.join(model_directory_path, model_file_name), weights_only="True"))
     model.eval()
 
-    #summary(model, input_size=(training_config['batch_size'], 3, 512, 512)) 
+    summary(model, input_size=(training_config['batch_size'], 3, 512, 512)) 
 
     cumulative_elapsed_time = 0.0
     # Inference
@@ -125,6 +125,7 @@ def main():
 
 
             original_image = imread(image_path).astype(np.float32) / 255.0
+            original_mask = imread(mask_path).astype(np.float32) / 255.0
 
             start = time.perf_counter()
             logits = model(prepare_img(original_image))    # Output Shape: (B, C ,H ,W) -> (1, 4, 512, 512)
@@ -138,6 +139,7 @@ def main():
 
             # Fix colours
             masks_image_fixed_colours = fix_colours(masks_image)
+            original_mask_fixed_colours = fix_colours(original_mask)
 
             #plt.imshow(masks_image_fixed_colours)
             #plt.show()
@@ -163,7 +165,7 @@ def main():
             # Save images
             os.makedirs(inference_directory_path, exist_ok=True)
             imageio.imwrite(os.path.join(inference_directory_path, f"{image_name[:-4]}_mask_{model_name}.png"), masks_image_fixed_colours.astype(np.uint8) * 255)
-            #imageio.imwrite(os.path.join(inference_directory_path, f"image_{image_name}.png"), (original_image * 255).astype(np.uint8))
+            imageio.imwrite(os.path.join(inference_directory_path, f"{image_name[:-4]}_GT_{model_name}.png"), (original_mask_fixed_colours * 255).astype(np.uint8))
             imageio.imwrite(os.path.join(inference_directory_path, f"{image_name[:-4]}_seg_{model_name}.png"), (segmented_image * 255).astype(np.uint8))
 
         print(f"\nInference saved at: {inference_directory_path}")

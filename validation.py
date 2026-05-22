@@ -50,7 +50,7 @@ def validate():
     #summary(model, input_size=(training_config['batch_size'], 3, 512, 512))
     
     # get data generators
-    training_generator, valid_generator, test_generator = get_data_generators(training_config['batch_size'])
+    training_generator, valid_generator, test_generator = get_data_generators(training_config['batch_size'], dataset_path=validation_config['dataset_path'])
 
     with torch.no_grad():
 
