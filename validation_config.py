@@ -5,12 +5,11 @@ import torch
 wandb_name = 'OdontoSeg'
 
 validation_config = {
-  'model_directory_path': 'models/resnet34_U-Net',
+  'model_directory_path': 'models/efficientnet-b6_U-Net',
   'configs_file_name': 'config.txt',
-  'model_file_name': 'resnet34_U-Net.pth',
-  #'dataset_path' : '/home/fisch/Documents/OdontoSeg/datasets/Dataset_Imagens_Clinicas_V2.0',
-  'dataset_path' : '/home/fisch/Documents/OdontoSeg/datasets/dataset_sri_lanka_no_healthy',
-  
+  'model_file_name': 'efficientnet-b6_U-Net.pth',
+  'dataset_path' : '/home/fisch/Documents/OdontoSeg/datasets/Dataset_Imagens_Clinicas_V2.0',
+  #'dataset_path' : '/home/fisch/Documents/OdontoSeg/datasets/dataset_sri_lanka_no_healthy',
 }
  
 path_models = '/home/fisch/Documents/OdontoSeg/models/'

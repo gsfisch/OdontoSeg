@@ -223,12 +223,12 @@ plt.ylim([0.0, 1.05])
 plt.xlabel("False Positive Rate")
 plt.ylabel("True Positive Rate")
 
-plt.title("ROC Curves for Lesion Classes")
+plt.title("ROC Curves - EfficientNet-b6 + U-Net")
 
 plt.legend(loc="lower right")
 plt.grid(True)
-
 plt.tight_layout()
+plt.savefig(f"./ROC_curves/{model_file_name[:-4]}_ROC_curve.png", dpi=300, bbox_inches='tight')
 plt.show()
 
 
