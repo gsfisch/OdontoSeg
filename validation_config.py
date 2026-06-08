@@ -5,11 +5,10 @@ import torch
 wandb_name = 'OdontoSeg'
 
 validation_config = {
-  'model_directory_path': 'models/swin_large_patch4_window7_224_U-Net++',
+  'model_directory_path': 'models/vit_large_patch16_224_U-Net++',
   'configs_file_name': 'config.txt',
-  'model_file_name': 'swin_large_patch4_window7_224_U-Net++.pth',
+  'model_file_name': 'vit_large_patch16_224_U-Net++.pth',
   'dataset_path' : '/home/fisch/Documents/OdontoSeg/datasets/Dataset_Imagens_Clinicas_V2.0',
-  #'dataset_path' : '/home/fisch/Documents/OdontoSeg/datasets/dataset_sri_lanka_no_healthy',
 }
  
 path_models = '/home/fisch/Documents/OdontoSeg/models/'

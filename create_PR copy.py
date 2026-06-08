@@ -8,7 +8,7 @@ import ast
 from util.data import get_data_generators
 from util.model import make_model
 
-from sklearn.metrics import roc_curve, auc
+from sklearn.metrics import roc_curve, auc, precision_recall_curve
 from sklearn.preprocessing import label_binarize
 
 
@@ -123,23 +123,23 @@ all_targets_bin = label_binarize(
 # ROC PER LESION CLASS
 # =========================================================
 
-fpr = dict()
-tpr = dict()
-roc_auc = dict()
+precision = dict()
+recall = dict()
+pr_auc = dict()
 
 for i in LESION_CLASSES:
 
-    fpr[i], tpr[i], _ = roc_curve(
+    precision[i], recall[i], _ = precision_recall_curve(
         all_targets_bin[:, i],
         all_probs[:, i]
     )
 
-    roc_auc[i] = auc(
-        fpr[i],
-        tpr[i]
+    pr_auc[i] = auc(
+        recall[i],
+        precision[i],
     )
 
-
+'''
 # =========================================================
 # MACRO-AVERAGE ROC
 # =========================================================
@@ -173,7 +173,7 @@ roc_auc["macro"] = auc(
     fpr["macro"],
     tpr["macro"]
 )
-
+'''
 
 # =========================================================
 # PLOT
@@ -188,49 +188,47 @@ for i, color in zip(LESION_CLASSES, colors):
     classes = ['MMN', 'OPMD', 'PL']
 
     plt.plot(
-        fpr[i],
-        tpr[i],
+        recall[i],
+        precision[i],
         color=color,
         lw=2,
-        label=f"{classes[i]} lesion (AUC = {roc_auc[i]:.4f})"
+        label=f"{classes[i]} lesion (AUC = {pr_auc[i]:.4f})"
     )
-
+'''
 # macro-average curve
 plt.plot(
-    fpr["macro"],
-    tpr["macro"],
+    recall["macro"],
+    precision["macro"],
     color="black",
     linestyle="--",
     lw=3,
-    label=f"Macro-average (AUC = {roc_auc['macro']:.4f})"
+    #label=f"Macro-average (AUC = {pr_auc['macro']:.4f})"
 )
 
 # random baseline
 plt.plot(
     [0, 1],
-    [0, 1],
+    [0.5, 0.5],
     "k:",
     lw=1
 )
+'''
 
 plt.xlim([0.0, 1.0])
 plt.ylim([0.0, 1.05])
 
-plt.xlabel("False Positive Rate")
-plt.ylabel("True Positive Rate")
+plt.xlabel("Recall")
+plt.ylabel("Precision")
 
-plt.title("ROC Curves - Swin Transf. + U-Net++")
+plt.title("PR Curves - EfficientNet + U-Net")
 
 plt.legend(loc="lower right")
 plt.grid(True)
 plt.tight_layout()
-plt.savefig(f"./ROC_curves/{model_file_name[:-4]}_ROC_curve.png", dpi=300, bbox_inches='tight')
+plt.savefig(f"./PR_curves/{model_file_name[:-4]}_PR_curve.png", dpi=300, bbox_inches='tight')
 plt.show()
 
 
-# =========================================================
-# PRINT RESULTS
-# =========================================================
 
 print("\nPer-class AUC:")
 

@@ -10,15 +10,61 @@ from util.model import make_model
 
 from sklearn.metrics import roc_curve, auc, precision_recall_curve
 from sklearn.preprocessing import label_binarize
+from sklearn.metrics import average_precision_score
 
 
-# =========================================================
-# SETTINGS
-# =========================================================
-
-NUM_CLASSES = 4                  # 0=background, 1-3=lesions
+NUM_CLASSES = 4
 LESION_CLASSES = [0, 1, 2]
 
+'''
+label_name = {
+    'efficientnet-b6_FPN': 'EfficientNet + FPN',
+    'efficientnet-b6_Linknet': 'EfficientNet + LinkNet',
+    'efficientnet-b6_U-Net': 'EfficientNet + U-Net',
+    'resnet34_U-Net': 'ResNet34 + U-Net',
+    'resnet34_Linknet': 'ResNet34 + LinkNet',
+    'resnet34_FPN': 'ResNet34 + FPN',
+    'resnet101_U-Net': 'ResNet101 + U-Net',
+    'resnet101_Linknet': 'ResNet101 + LinkNet',
+    'resnet101_FPN': 'ResNet101 + FPN',
+    'SegFormer_mit_b0': 'SegFormer b0',
+    'SegFormer_mit_b1': 'SegFormer b1',
+    'SegFormer_mit_b2': 'SegFormer b2',
+    'SegFormer_mit_b3': 'SegFormer b3',
+    'SegFormer_mit_b4': 'SegFormer b4',
+    'SegFormer_mit_b5': 'SegFormer b5',
+    'vgg16_FPN': 'VGG16 + FPN',
+    'vgg16_Linknet': 'VGG16 + LinkNet',
+    'vgg16_U-Net': 'VGG16 + U-Net',
+    'vit_large_patch16_224_FPN': 'ViT + FPN',
+    'vit_large_patch16_224_Linknet': 'ViT + LinkNet',
+    'vit_large_patch16_224_MAnet': 'ViT + MA-Net',
+    'vit_large_patch16_224_U-Net': 'ViT + U-Net',
+    'vit_large_patch16_224_U-Net++': 'ViT + U-Net++',
+    '': '',
+    '': '',
+    '': '',
+    '': '',
+    '': '',
+    '': '',
+    '': '',
+    '': '',
+    '': '',
+    '': '',
+    '': '',
+    '': '',
+    '': '',
+    '': '',
+    '': '',
+    '': '',
+    '': '',
+    '': '',
+    '': '',
+    '': '',
+    '': '',
+    '': '',
+}
+'''
 
 model_directory_path = validation_config['model_directory_path']
 configs_file_name = validation_config['configs_file_name']
@@ -55,13 +101,13 @@ all_targets = []
 
 
 # get data generators
-_, _, test_generator = get_data_generators(batch_size=8, dataset_path='/home/fisch/Documents/OdontoSeg/datasets/Dataset_Imagens_Clinicas_V2.0')
+_, _, test_generator = get_data_generators(batch_size=2, dataset_path='/home/fisch/Documents/OdontoSeg/datasets/Dataset_Imagens_Clinicas_V2.0')
 
 
 with torch.no_grad():
 
     total_batches = len(test_generator)
-    loop = tqdm(enumerate(test_generator), total=total_batches, desc='ROC')
+    loop = tqdm(enumerate(test_generator), total=total_batches, desc='PR')
 
     for batch_idx, (images, masks) in loop:
 
@@ -95,28 +141,23 @@ with torch.no_grad():
         all_targets.append(masks)
 
 
-# =========================================================
-# CONCATENATE ALL DATA
-# =========================================================
 
+# Concatenate
 all_probs = np.concatenate(all_probs, axis=0)
 all_targets = np.concatenate(all_targets, axis=0)
 
 print("Probabilities shape:", all_probs.shape)
 print("Targets shape:", all_targets.shape)
 
+print(all_targets[:4])
 
-# =========================================================
-# BINARIZE TARGETS
-# =========================================================
-
+# One-hot encoding
 all_targets_bin = label_binarize(
     all_targets,
     classes=np.arange(NUM_CLASSES)
 )
 
-# shape:
-# [N_pixels, NUM_CLASSES]
+print("Binary targets shape:", all_targets_bin.shape) # [Pixels, classes]
 
 
 # =========================================================
@@ -125,7 +166,8 @@ all_targets_bin = label_binarize(
 
 precision = dict()
 recall = dict()
-pr_auc = dict()
+#pr_auc = dict()
+ap = dict()
 
 for i in LESION_CLASSES:
 
@@ -134,51 +176,78 @@ for i in LESION_CLASSES:
         all_probs[:, i]
     )
 
+    '''
     pr_auc[i] = auc(
         recall[i],
         precision[i],
     )
+    '''
 
-'''
+    # average precision
+    ap[i] = average_precision_score(
+        all_targets_bin[:, i],
+        all_probs[:, i]
+    )
+
+
 # =========================================================
-# MACRO-AVERAGE ROC
+# MACRO-AVERAGE PR
 # =========================================================
 
-# collect all FPR points
-all_fpr = np.unique(
+# all Recall points
+all_recall = np.unique(
     np.concatenate(
-        [fpr[i] for i in LESION_CLASSES]
+        [recall[i] for i in LESION_CLASSES]
     )
 )
 
-# mean TPR
-mean_tpr = np.zeros_like(all_fpr)
+# mean Precision
+mean_precision = np.zeros_like(all_recall)
 
 for i in LESION_CLASSES:
 
-    mean_tpr += np.interp(
-        all_fpr,
-        fpr[i],
-        tpr[i]
+    mean_precision += np.interp(
+        all_recall,
+        recall[i],
+        precision[i]
     )
 
 # average
-mean_tpr /= len(LESION_CLASSES)
+mean_precision /= len(LESION_CLASSES)
 
-# macro ROC
-fpr["macro"] = all_fpr
-tpr["macro"] = mean_tpr
+# macro PR
+recall["macro"] = all_recall
+precision["macro"] = mean_precision
 
-roc_auc["macro"] = auc(
-    fpr["macro"],
-    tpr["macro"]
+'''
+pr_auc["macro"] = auc(
+    recall["macro"],
+    precision["macro"],
 )
 '''
 
-# =========================================================
-# PLOT
-# =========================================================
+ap["macro"] = np.mean([ap[i] for i in LESION_CLASSES])
 
+precision["micro"], recall["micro"], _ = precision_recall_curve(
+    all_targets_bin[:, LESION_CLASSES].ravel(),
+    all_probs[:, LESION_CLASSES].ravel()
+)
+
+ap["micro"] = average_precision_score(
+    all_targets_bin[:, LESION_CLASSES],
+    all_probs[:, LESION_CLASSES],
+    average="micro"
+)
+
+'''
+for i in LESION_CLASSES:
+    # Look at distribution of predicted probabilities for that class
+    plt.hist(all_probs[:, i], bins=100)
+    plt.title(f"Class {i} probability histogram")
+    plt.show()
+'''
+
+# Plot
 plt.figure(figsize=(8, 8))
 
 colors = ["red", "yellow", "green"]
@@ -192,26 +261,31 @@ for i, color in zip(LESION_CLASSES, colors):
         precision[i],
         color=color,
         lw=2,
-        label=f"{classes[i]} lesion (AUC = {pr_auc[i]:.4f})"
+        #label=f"{classes[i]} lesion (AUC = {pr_auc[i]:.4f})"
+        label=f"{classes[i]} lesion (AP = {ap[i]:.4f})"
     )
 '''
-# macro-average curve
+# macro-average AP
 plt.plot(
     recall["macro"],
     precision["macro"],
     color="black",
     linestyle="--",
     lw=3,
-    #label=f"Macro-average (AUC = {pr_auc['macro']:.4f})"
+    label=f"Macro-average (AP = {ap['macro']:.4f})"
+)
+
+
+# micro-average AP
+plt.plot(
+    recall["micro"],
+    precision["micro"],
+    color="black",
+    linestyle="--",
+    lw=3,
+    label=f"Micro-average (AP = {ap['micro']:.4f})"
 )
 '''
-# random baseline
-plt.plot(
-    [0, 1],
-    [0, 1],
-    "k:",
-    lw=1
-)
 
 plt.xlim([0.0, 1.0])
 plt.ylim([0.0, 1.05])
@@ -219,22 +293,20 @@ plt.ylim([0.0, 1.05])
 plt.xlabel("Recall")
 plt.ylabel("Precision")
 
-plt.title("PR Curves - Swin Transf. + U-Net++")
+plt.title("PR Curves - ViT + U-Net++")
 
 plt.legend(loc="lower right")
 plt.grid(True)
 plt.tight_layout()
 plt.savefig(f"./PR_curves/{model_file_name[:-4]}_PR_curve.png", dpi=300, bbox_inches='tight')
+plt.savefig(f"./PR_curves_jpeg/{model_file_name[:-4]}_PR_curve.jpeg", dpi=300, bbox_inches='tight')
 plt.show()
 
 
-# =========================================================
-# PRINT RESULTS
-# =========================================================
 
-print("\nPer-class AUC:")
+print("\nPer-class AP:")
 
 for i in LESION_CLASSES:
-    print(f"Lesion Class {i}: {roc_auc[i]:.4f}")
+    print(f"Lesion Class {i}: {ap[i]:.4f}")
 
-print(f"\nMacro-average AUC: {roc_auc['macro']:.4f}")
+print(f"\nMacro-average AP: {ap['macro']:.4f}")
