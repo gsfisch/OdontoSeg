@@ -51,22 +51,27 @@ label_name = {
     'swin_large_patch4_window7_224_MAnet': 'Swin Transf. + MA-Net',
     'swin_large_patch4_window7_224_U-Net': 'Swin Transf. + U-Net',
     'swin_large_patch4_window7_224_U-Net++': 'Swin Transf. + U-Net++',
-    '': '',
-    '': '',
-    '': '',
-    '': '',
-    '': '',
-    '': '',
-    '': '',
-    '': '',
-    '': '',
-    '': '',
-    '': '',
-    '': '',
+    'caformer_b36_FPN': 'CAFormer + FPN',
+    'caformer_b36_Linknet': 'CAFormer + LinkNet',
+    'caformer_b36_MAnet': 'CAFormer + MA-Net',
+    'caformer_b36_U-Net': 'CAFormer + U-Net',
+    'caformer_b36_U-Net++': 'CAFormer + U-Net++',
+    'inceptionv4_FPN': 'Inception V4 + FPN',
+    'inceptionv4_Linknet': 'Inception V4 + LinkNet',
+    'inceptionv4_U-Net': 'Inception V4 + U-Net',
+    'resnet101_FPN': 'ResNet101 + FPN',
+    'resnet101_Linknet': 'ResNet101 + LinkNet',
+    'resnet101_U-Net': 'ResNet101 + U-Net',
+    'resnet34_FPN': 'ResNet34 + FPN',
+    'resnet34_Linknet': 'ResNet34 + LinkNet',
+    'MedFormer': 'MedFormer',
+    'TransUNet': 'TransUNet',
+    'UNETR_64': 'UNETR',
+    'SwinUNETR': 'SwinUNETR',
 }
 
 
-skip_names = ['old_dataset', 'resnet101_Linknet_batch8']
+skip_names = ['old_dataset', 'resnet101_FPN_batch8_rangerlars', 'resnet101_U-Net_batch8_rangerlars', 'UNETR_old']
 
 model_directory_path = validation_config['model_directory_path']
 configs_file_name = validation_config['configs_file_name']
