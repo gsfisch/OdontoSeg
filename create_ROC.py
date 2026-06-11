@@ -65,7 +65,7 @@ label_name = {
 }
 
 
-skip_names = ['old_dataset', 'resnet101_FPN_batch8_rangerlars', 'resnet101_U-Net_batch8_rangerlars', 'UNETR_old']
+skip_names = ['old_dataset', 'resnet101_FPN_batch8_rangerlars', 'resnet101_U-Net_batch8_rangerlars', 'UNETR_old', 'resnet101_Linknet_batch8']
 
 NUM_CLASSES = 4
 LESION_CLASSES = [0, 1, 2]
