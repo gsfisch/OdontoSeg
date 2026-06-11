@@ -73,9 +73,6 @@ label_name = {
 
 skip_names = ['old_dataset', 'resnet101_FPN_batch8_rangerlars', 'resnet101_U-Net_batch8_rangerlars', 'UNETR_old']
 
-model_directory_path = validation_config['model_directory_path']
-configs_file_name = validation_config['configs_file_name']
-model_file_name = validation_config['model_file_name']
 
 for model_name in os.listdir('./models'):
     if model_name in skip_names:
@@ -86,7 +83,6 @@ for model_name in os.listdir('./models'):
     model_directory_path = f'models/{model_name}'
     configs_file_name = 'config.txt'
     model_file_name = f'{model_name}.pth'
-
 
 
     # Read training configurations
@@ -135,7 +131,7 @@ for model_name in os.listdir('./models'):
             # logits shape:
             # [B, C, H, W]
             logits = model(images)
-            print(f'{logits.shape=}')
+            #print(f'{logits.shape=}')
 
             # probabilities
             probs = torch.softmax(logits, dim=1)
@@ -164,10 +160,6 @@ for model_name in os.listdir('./models'):
     all_probs = np.concatenate(all_probs, axis=0)
     all_targets = np.concatenate(all_targets, axis=0)
 
-    print("Probabilities shape:", all_probs.shape)
-    print("Targets shape:", all_targets.shape)
-
-    print(all_targets[:4])
 
     # One-hot encoding
     all_targets_bin = label_binarize(
@@ -175,16 +167,9 @@ for model_name in os.listdir('./models'):
         classes=np.arange(NUM_CLASSES)
     )
 
-    print("Binary targets shape:", all_targets_bin.shape) # [Pixels, classes]
-
-
-    # =========================================================
-    # ROC PER LESION CLASS
-    # =========================================================
 
     precision = dict()
     recall = dict()
-    #pr_auc = dict()
     ap = dict()
 
     for i in LESION_CLASSES:
@@ -194,13 +179,6 @@ for model_name in os.listdir('./models'):
             all_probs[:, i]
         )
 
-        '''
-        pr_auc[i] = auc(
-            recall[i],
-            precision[i],
-        )
-        '''
-
         # average precision
         ap[i] = average_precision_score(
             all_targets_bin[:, i],
@@ -208,78 +186,21 @@ for model_name in os.listdir('./models'):
         )
 
 
-    # =========================================================
-    # MACRO-AVERAGE PR
-    # =========================================================
-
-    # all Recall points
-    all_recall = np.unique(
-        np.concatenate(
-            [recall[i] for i in LESION_CLASSES]
-        )
-    )
-
-    # mean Precision
-    mean_precision = np.zeros_like(all_recall)
-
-    for i in LESION_CLASSES:
-
-        mean_precision += np.interp(
-            all_recall,
-            recall[i],
-            precision[i]
-        )
-
-    # average
-    mean_precision /= len(LESION_CLASSES)
-
-    # macro PR
-    recall["macro"] = all_recall
-    precision["macro"] = mean_precision
-
-    '''
-    pr_auc["macro"] = auc(
-        recall["macro"],
-        precision["macro"],
-    )
-    '''
-
-    ap["macro"] = np.mean([ap[i] for i in LESION_CLASSES])
-
-    precision["micro"], recall["micro"], _ = precision_recall_curve(
-        all_targets_bin[:, LESION_CLASSES].ravel(),
-        all_probs[:, LESION_CLASSES].ravel()
-    )
-
-    ap["micro"] = average_precision_score(
-        all_targets_bin[:, LESION_CLASSES],
-        all_probs[:, LESION_CLASSES],
-        average="micro"
-    )
-
-    '''
-    for i in LESION_CLASSES:
-        # Look at distribution of predicted probabilities for that class
-        plt.hist(all_probs[:, i], bins=100)
-        plt.title(f"Class {i} probability histogram")
-        plt.show()
-    '''
-
     # Plot
     plt.figure(figsize=(8, 8))
 
-    colors = ["red", "yellow", "green"]
+    colors = ["r", "y", "g"]
+    shape = ['-' , '--', ':']
 
-    for i, color in zip(LESION_CLASSES, colors):
-
+    #for i, color in zip(LESION_CLASSES, colors):
+    for i in range(len(colors)):
         classes = ['MMN', 'OPMD', 'PL']
 
         plt.plot(
             recall[i],
             precision[i],
-            color=color,
+            f'{shape[i]}{colors[i]}',
             lw=2,
-            #label=f"{classes[i]} lesion (AUC = {pr_auc[i]:.4f})"
             label=f"{classes[i]} lesion (AP = {ap[i]:.4f})"
         )
     '''
@@ -306,14 +227,15 @@ for model_name in os.listdir('./models'):
     '''
 
     plt.xlim([0.0, 1.0])
-    plt.ylim([0.0, 1.05])
+    plt.ylim([0.0, 1.0])
 
-    plt.xlabel("Recall")
-    plt.ylabel("Precision")
+    plt.xlabel("Recall", fontsize=18)
+    plt.ylabel("Precision", fontsize=18)
 
-    plt.title(f"PR Curves - {label_name[model_name]}")
+    plt.title(f"PR Curves - {label_name[model_name]}", fontsize=24)
 
-    plt.legend(loc="lower right")
+    plt.legend(loc="lower left")
+    #plt.legend(loc="center left", bbox_to_anchor=[1, 0.5])
     plt.grid(True)
     plt.tight_layout()
     plt.savefig(f"./PR_curves/{model_file_name[:-4]}_PR_curve.png", dpi=300, bbox_inches='tight')
@@ -327,4 +249,4 @@ for model_name in os.listdir('./models'):
     for i in LESION_CLASSES:
         print(f"Lesion Class {i}: {ap[i]:.4f}")
 
-    print(f"\nMacro-average AP: {ap['macro']:.4f}")
+    #print(f"\nMacro-average AP: {ap['macro']:.4f}")
