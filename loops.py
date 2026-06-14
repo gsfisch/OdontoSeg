@@ -190,7 +190,52 @@ def val_loop(generator, model, num_classes=4):
     metrics = compute_metrics_from_confusion_matrix(conf_matrix)
     metrics["loss"] = total_loss / total_samples
 
+
     return metrics
+
+
+def val_loop_conf_matrix(generator, model, num_classes=4):
+    model.eval()
+
+    total_loss = 0.0
+    total_samples = 0
+
+    conf_matrix = torch.zeros((num_classes, num_classes), dtype=torch.float64).cuda()
+    loss_function = training_config['loss_function']
+
+    with torch.no_grad():
+
+        loop = tqdm(generator, total=len(generator), desc='Validation')
+
+
+        for images, masks in loop:
+            images = images.permute(0, 3, 1, 2).cuda(non_blocking=True)
+            masks = masks.long().cuda(non_blocking=True)
+
+            batch_size = images.size(0)            
+            
+            total_samples += batch_size
+
+            outputs = model(images)
+
+            loss = criterion(
+                option=loss_function,
+                outputs=outputs,
+                masks=masks
+            )
+
+            total_loss += loss.item() * batch_size
+
+            preds = torch.argmax(outputs, dim=1)
+            conf_matrix += compute_confusion_matrix(preds, masks, num_classes)
+
+    # Final metrics
+    metrics = compute_metrics_from_confusion_matrix(conf_matrix)
+    metrics["loss"] = total_loss / total_samples
+
+
+    return metrics, conf_matrix
+
 
 '''
 def val_loop(generator, model):
