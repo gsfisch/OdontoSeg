@@ -128,10 +128,8 @@ for model_name in os.listdir('./models'):
             images = images.permute(0, 3, 1, 2).cuda() # [B, C, H, W]
             masks = masks.cuda() # [B, H, W]
 
-            # logits shape:
-            # [B, C, H, W]
-            logits = model(images)
-            #print(f'{logits.shape=}')
+            
+            logits = model(images) # [B, C, H, W]
 
             # probabilities
             probs = torch.softmax(logits, dim=1)
@@ -139,10 +137,6 @@ for model_name in os.listdir('./models'):
             probs = probs.cpu().numpy()
             masks = masks.cpu().numpy()
 
-            # -------------------------------------------------
-            # reshape probabilities
-            # [B,C,H,W] -> [N_pixels,C]
-            # -------------------------------------------------
 
             probs = np.transpose(probs, (0, 2, 3, 1))
             probs = probs.reshape(-1, NUM_CLASSES)
@@ -192,7 +186,7 @@ for model_name in os.listdir('./models'):
     colors = ["r", "y", "g"]
     shape = ['-' , '--', ':']
 
-    #for i, color in zip(LESION_CLASSES, colors):
+
     for i in range(len(colors)):
         classes = ['MMN', 'OPMD', 'PL']
 
@@ -203,28 +197,7 @@ for model_name in os.listdir('./models'):
             lw=2,
             label=f"{classes[i]} lesion (AP = {ap[i]:.4f})"
         )
-    '''
-    # macro-average AP
-    plt.plot(
-        recall["macro"],
-        precision["macro"],
-        color="black",
-        linestyle="--",
-        lw=3,
-        label=f"Macro-average (AP = {ap['macro']:.4f})"
-    )
 
-
-    # micro-average AP
-    plt.plot(
-        recall["micro"],
-        precision["micro"],
-        color="black",
-        linestyle="--",
-        lw=3,
-        label=f"Micro-average (AP = {ap['micro']:.4f})"
-    )
-    '''
 
     plt.xlim([0.0, 1.0])
     plt.ylim([0.0, 1.0])
@@ -235,18 +208,13 @@ for model_name in os.listdir('./models'):
     plt.title(f"PR Curves - {label_name[model_name]}", fontsize=24)
 
     plt.legend(loc="lower left")
-    #plt.legend(loc="center left", bbox_to_anchor=[1, 0.5])
     plt.grid(True)
     plt.tight_layout()
     plt.savefig(f"./PR_curves/{model_file_name[:-4]}_PR_curve.png", dpi=300, bbox_inches='tight')
     plt.savefig(f"./PR_curves_jpeg/{model_file_name[:-4]}_PR_curve.jpeg", dpi=300, bbox_inches='tight')
-    #plt.show()
-
 
 
     print("\nPer-class AP:")
 
     for i in LESION_CLASSES:
         print(f"Lesion Class {i}: {ap[i]:.4f}")
-
-    #print(f"\nMacro-average AP: {ap['macro']:.4f}")

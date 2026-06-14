@@ -70,11 +70,6 @@ skip_names = ['old_dataset', 'resnet101_FPN_batch8_rangerlars', 'resnet101_U-Net
 NUM_CLASSES = 4
 LESION_CLASSES = [0, 1, 2]
 
-'''
-model_directory_path = validation_config['model_directory_path']
-configs_file_name = validation_config['configs_file_name']
-model_file_name = validation_config['model_file_name']
-'''
 
 for model_name in os.listdir('./models'):
     if model_name in skip_names:
@@ -140,10 +135,6 @@ for model_name in os.listdir('./models'):
             probs = probs.cpu().numpy()
             masks = masks.cpu().numpy()
 
-            # -------------------------------------------------
-            # reshape probabilities
-            # [B,C,H,W] -> [N_pixels,C]
-            # -------------------------------------------------
 
             probs = np.transpose(probs, (0, 2, 3, 1))
             probs = probs.reshape(-1, NUM_CLASSES)
@@ -156,10 +147,7 @@ for model_name in os.listdir('./models'):
             all_targets.append(masks)
 
 
-    # =========================================================
-    # CONCATENATE ALL DATA
-    # =========================================================
-
+    # Concatenate
     all_probs = np.concatenate(all_probs, axis=0)
     all_targets = np.concatenate(all_targets, axis=0)
 
@@ -167,23 +155,14 @@ for model_name in os.listdir('./models'):
     print("Targets shape:", all_targets.shape)
 
 
-    # =========================================================
-    # BINARIZE TARGETS
-    # =========================================================
-
+    # One hot encoding
     all_targets_bin = label_binarize(
         all_targets,
         classes=np.arange(NUM_CLASSES)
     )
 
-    # shape:
-    # [N_pixels, NUM_CLASSES]
 
-
-    # =========================================================
-    # ROC PER LESION CLASS
-    # =========================================================
-
+    # ROC per lesion
     fpr = dict()
     tpr = dict()
     roc_auc = dict()
@@ -251,17 +230,6 @@ for model_name in os.listdir('./models'):
             label=f"{classes[i]} lesion (AUC = {roc_auc[i]:.4f})"
         )
 
-    '''
-    # macro-average curve
-    plt.plot(
-        fpr["macro"],
-        tpr["macro"],
-        color="black",
-        linestyle="--",
-        lw=3,
-        label=f"Macro-average (AUC = {roc_auc['macro']:.4f})"
-    )
-    '''
 
     # random baseline
     plt.plot(
@@ -284,12 +252,9 @@ for model_name in os.listdir('./models'):
     plt.tight_layout()
     plt.savefig(f"./ROC_curves/{model_file_name[:-4]}_ROC_curve.png", dpi=300, bbox_inches='tight')
     plt.savefig(f"./ROC_curves_jpeg/{model_file_name[:-4]}_ROC_curve.jpeg", dpi=300, bbox_inches='tight')
-    #plt.show()
 
 
     print("\nPer-class AUC:")
 
     for i in LESION_CLASSES:
         print(f"Lesion Class {i}: {roc_auc[i]:.4f}")
-
-    #print(f"\nMacro-average AUC: {roc_auc['macro']:.4f}")
