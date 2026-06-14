@@ -71,7 +71,7 @@ label_name = {
 }
 
 
-skip_names = ['old_dataset', 'resnet101_FPN_batch8_rangerlars', 'resnet101_U-Net_batch8_rangerlars', 'UNETR_old']
+skip_names = ['old_dataset', 'resnet101_FPN_batch8_rangerlars', 'resnet101_U-Net_batch8_rangerlars', 'UNETR_old', 'resnet101_Linknet_batch8']
 
 
 for model_name in os.listdir('./models'):
