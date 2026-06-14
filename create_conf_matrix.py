@@ -165,7 +165,7 @@ def generate_confusion_matrix():
 
             plt.tight_layout()
             plt.savefig(f"./confusion_matrices/{model_file_name[:-4]}_confusion_matrix.png", dpi=300, bbox_inches="tight")
-            plt.show()
+            #plt.show()
 
 
 if __name__ == "__main__":
