@@ -1,4 +1,5 @@
 import os
+import numpy as np
 os.environ['PYTORCH_CUDA_ALLOC_CONF'] = 'expandable_segments:True'
 import torch
 #from test import test_routine
@@ -12,12 +13,16 @@ from config import training_config, wandb_config, wandb_name, path_models
 from util.scheduler import FlatplusAnneal, FlatplusAnnealTeste
 from torchinfo import summary
 import torchseg
+import random
 
 
 def train():
     for i in range(2, 6):
         torch.cuda.empty_cache()
         torch.manual_seed(i)
+        np.random.seed(i)  
+        random.seed(i)
+        torch.cuda.manual_seed(i)    
         experiment_name = training_config['experiment_name']
         num_epochs = training_config['epochs']
         epoch_to_unfreeze_encoder = 300
@@ -43,7 +48,7 @@ def train():
 
         
         # get data generators
-        training_generator, valid_generator, test_generator = get_data_generators()
+        training_generator, valid_generator, test_generator = get_data_generators(seed=i)
         
         # initialize optimizer and scheduler
         opt = optimizer(
@@ -98,6 +103,8 @@ def train():
             scheduler.step()
 
             current_lr = opt.param_groups[0]['lr']
+
+            print(current_lr)
 
             # Print and log results
             print(f'\nEpoch {epoch}/{num_epochs - 1}, '

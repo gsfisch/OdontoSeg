@@ -5,8 +5,8 @@ wandb_name = 'OdontoSeg_Reviewed'
 
 
 training_config = {
-  'experiment_name': 'deit3_base_patch16_224_U-Net',
-  'encoder' : 'deit3_base_patch16_224',
+  'experiment_name': 'efficientnet-b6_U-Net',
+  'encoder' : 'efficientnet-b6',
   'architecture': 'U-Net',
   'epochs': 200,
   'batch_size': 4,
@@ -20,7 +20,7 @@ training_config = {
   'classes': 4,
   'class_weigths': 
   [0.6471186223837316, 1.0, 2.613295558781593, 0.03166476775283598], # calculated by the inverse of pixels frequency
-  'library': 'torchseg',
+  'library': 'smp',
   'encoder_depth': 4,
   'freeze_encoder': False,
   'need_wrapper': False,

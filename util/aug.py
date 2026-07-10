@@ -22,6 +22,7 @@ from albumentations import (
     Posterize,
     Normalize,
     ReplayCompose,
+    Compose,
     GaussianBlur,
     RandomScale,
     RandomResizedCrop,
@@ -152,8 +153,9 @@ def one_of():
 #     # Normalize(p=1.0)
 #     return AUGMENTATIONS_TRAIN, AUGMENTATIONS_VALID
 
-def create_augmentations():
-    AUGMENTATIONS_TRAIN =  ReplayCompose([
+def create_augmentations(seed=None):
+    #AUGMENTATIONS_TRAIN =  ReplayCompose([
+    AUGMENTATIONS_TRAIN =  Compose([
         HorizontalFlip(p=0.5),
         VerticalFlip(p=0.5),
         RandomRotate90(p=0.5),
@@ -182,7 +184,7 @@ def create_augmentations():
         # # Normalize(mean=(0.4539007 , 0.37364626, 0.34778222),std=(0.2540404 , 0.19213188, 0.18562855), p=1)
         #RandomCrop(352, 480),
         # Normalize(p=1.0)
-    ], p = 1.0)
+    ], p = 1.0, seed=seed)
 
     AUGMENTATIONS_VALID = ReplayCompose([
         # Normalize(p=0.0)
