@@ -210,8 +210,8 @@ for model_name in os.listdir('./models'):
     plt.legend(loc="lower left")
     plt.grid(True)
     plt.tight_layout()
-    plt.savefig(f"./PR_curves/{model_file_name[:-4]}_PR_curve.png", dpi=300, bbox_inches='tight')
-    plt.savefig(f"./PR_curves_jpeg/{model_file_name[:-4]}_PR_curve.jpeg", dpi=300, bbox_inches='tight')
+    plt.savefig(f"./PR_curves/{model_file_name[:-4]}_PR_curve.pdf", dpi=300, bbox_inches='tight')
+    #plt.savefig(f"./PR_curves_jpeg/{model_file_name[:-4]}_PR_curve.jpeg", dpi=300, bbox_inches='tight')
 
 
     print("\nPer-class AP:")

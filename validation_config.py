@@ -5,10 +5,11 @@ import torch
 wandb_name = 'OdontoSeg'
 
 validation_config = {
-  'model_directory_path': 'models/caformer_b36_U-Net',
+  'model_directory_path': 'models/SwinUNETR',
   'configs_file_name': 'config.txt',
-  'model_file_name': 'caformer_b36_U-Net.pth',
-  'dataset_path' : '/home/fisch/Documents/OdontoSeg/datasets/Dataset_Imagens_Clinicas_V2.0',
+  'model_file_name': 'SwinUNETR.pth',
+  #'dataset_path' : '/home/fisch/Documents/OdontoSeg/datasets/Dataset_Imagens_Clinicas_V2.0',
+  'dataset_path' : '/home/fisch/Documents/OdontoSeg/datasets/Dataset_Imagens_Clinicas_V2.0_sem_pacientes_em_multiplos_splits',
 }
  
 path_models = '/home/fisch/Documents/OdontoSeg/models/'

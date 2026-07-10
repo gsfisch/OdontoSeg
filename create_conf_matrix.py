@@ -149,7 +149,7 @@ def generate_confusion_matrix():
                 cm,
                 annot=True,
                 fmt=".4f",
-                cmap="coolwarm",
+                cmap="Blues",
                 cbar=True,
                 square=True,
                 linewidths=0.5,
@@ -164,7 +164,7 @@ def generate_confusion_matrix():
             #plt.title(f"Confusion Matrix  - ", fontsize=20)
 
             plt.tight_layout()
-            plt.savefig(f"./confusion_matrices/{model_file_name[:-4]}_confusion_matrix.png", dpi=300, bbox_inches="tight")
+            plt.savefig(f"./confusion_matrices/{model_file_name[:-4]}_confusion_matrix.pdf", dpi=300, bbox_inches="tight")
             #plt.show()
 
 

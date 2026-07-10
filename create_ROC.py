@@ -111,7 +111,7 @@ for model_name in os.listdir('./models'):
 
 
     # get data generators
-    _, _, test_generator = get_data_generators(batch_size=8, dataset_path='/home/fisch/Documents/OdontoSeg/datasets/Dataset_Imagens_Clinicas_V2.0')
+    _, _, test_generator = get_data_generators(batch_size=2, dataset_path='/home/fisch/Documents/OdontoSeg/datasets/Dataset_Imagens_Clinicas_V2.0')
 
 
     with torch.no_grad():
@@ -250,7 +250,7 @@ for model_name in os.listdir('./models'):
     plt.legend(loc="lower right")
     plt.grid(True)
     plt.tight_layout()
-    plt.savefig(f"./ROC_curves/{model_file_name[:-4]}_ROC_curve.png", dpi=300, bbox_inches='tight')
+    plt.savefig(f"./ROC_curves/{model_file_name[:-4]}_ROC_curve.pdf", dpi=300, bbox_inches='tight')
     plt.savefig(f"./ROC_curves_jpeg/{model_file_name[:-4]}_ROC_curve.jpeg", dpi=300, bbox_inches='tight')
 
 

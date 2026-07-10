@@ -5,7 +5,7 @@ wandb_name = 'OdontoSeg_Reviewed'
 
 
 training_config = {
-  'experiment_name': 'resnet34_FPN_new',
+  'experiment_name': 'resnet34_FPN',
   'encoder' : 'resnet34',
   'architecture': 'FPN',
   'epochs': 200,
