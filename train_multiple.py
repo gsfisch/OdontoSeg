@@ -56,12 +56,14 @@ def train():
         scheduler = FlatplusAnneal(opt, max_iter=training_config['epochs'], step_size=training_config['scheduler_step_size'])
         
         # Initialize WandB
+        '''
         wandb.init(
             project=wandb_name,
             name=f"{training_config['experiment_name']}" + "_alternative_{i}",
             config=wandb_config
         )
-        
+        '''
+
         best_model_loss = float('inf')
         best_model_dice = float('-inf')
 
@@ -116,6 +118,7 @@ def train():
 
                 print(f"Saving Checkpoint at epoch: {epoch}")
             
+            '''
             metrics_wandb = logging_wandb(metrics_train, metrics_val)
             
             wandb.log({
@@ -123,8 +126,9 @@ def train():
                 'learning_rate': current_lr,
                 'epoch': epoch
             })
+            '''
 
-        wandb.finish()
+        #wandb.finish()
 
     return
 
