@@ -10,8 +10,10 @@ import wandb
 from datetime import datetime
 from config import training_config, wandb_config, wandb_name, path_models
 from util.scheduler import FlatplusAnneal, FlatplusAnnealTeste
-from torchinfo import summary
-import torchseg
+#from torchinfo import summary
+#import torchseg
+import random
+import numpy as np
 
 
 def train():
@@ -20,6 +22,10 @@ def train():
     num_epochs = training_config['epochs']
     epoch_to_unfreeze_encoder = 300
     #device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    torch.manual_seed(2)
+    np.random.seed(2)
+    random.seed(2)
+    torch.cuda.manual_seed(2)
 
 
     # initialize model
@@ -37,11 +43,11 @@ def train():
                        freeze_encoder=training_config['freeze_encoder'], need_wrapper=training_config['need_wrapper']).cuda()
     
 
-    summary(model, input_size=(training_config['batch_size'], 3, 512, 512))
+    #summary(model, input_size=(training_config['batch_size'], 3, 512, 512))
 
     
     # get data generators
-    training_generator, valid_generator, test_generator = get_data_generators()
+    training_generator, valid_generator, _ = get_data_generators(seed=2)
     
     # initialize optimizer and scheduler
     opt = optimizer(
