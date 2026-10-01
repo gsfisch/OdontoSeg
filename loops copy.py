@@ -1,9 +1,9 @@
 import torch
+import time
 from tqdm import tqdm
 from util.new_metrics import calculate_accuracy, calculate_mean_iou, calculate_precision_recall, calculate_dice_coefficient, calculate_weighted_accuracy, calculate_weighted_miou
 from loss.main import criterion
 from config import training_config
-
 
 def compute_metrics_from_confusion_matrix(conf_matrix, eps=1e-7):
     """
@@ -117,7 +117,16 @@ def train_loop(generator, optimizer, model, num_classes=4):
         loss = criterion(option=loss_function, outputs=outputs, masks=masks)
         loss.backward()
         optimizer.step()
-
+        #time.sleep(training_config['delay_per_batch'])
+        
+        '''
+        # Compute and accumulate metrics
+        metrics = compute_metrics(outputs, masks)
+        running_metrics["loss"] += loss.item()
+        for key in running_metrics:
+            if key != "loss":
+                running_metrics[key] += metrics[key]
+        '''
         total_loss += loss.item() * batch_size
 
         preds = torch.argmax(outputs, dim=1)
@@ -140,66 +149,13 @@ def train_loop(generator, optimizer, model, num_classes=4):
     #avg_metrics = {key: value / total_batches for key, value in running_metrics.items()}
 
 
-def find_true_positive_per_image(preds, masks):
-    # Given preds and masks (a batch), computes how many images in the batch would be correctly classified
-    
-    b, h, w = masks.shape
-
-    true_positive_per_image = 0
-
-    for i in range(b):
-
-        # Find most ocurring class in the masks
-        highest_count_id_masks = 0 # MMN
-        highest_count_masks = 0
-
-        number_of_MMN = (masks[i, :, :] == 0).sum(); highest_count_masks = number_of_MMN
-        number_of_OPMD = (masks[i, :, :] == 1).sum()
-                
-        if number_of_OPMD > highest_count_masks:
-            highest_count_id_masks = 1
-            highest_count_masks = number_of_OPMD
-
-        number_of_PL = (masks[i, :, :] == 2).sum()
-
-        if number_of_PL > highest_count_masks:
-            highest_count_id_masks = 2
-            highest_count_masks = number_of_PL
-
-
-        # Find most ocurring class in the preds
-        highest_count_id_preds = 0 # MMN
-        highest_count_preds = 0
-
-        number_of_MMN = (preds[i, :, :] == 0).sum(); highest_count_preds = number_of_MMN
-        number_of_OPMD = (preds[i, :, :] == 1).sum()
-                
-        if number_of_OPMD > highest_count_preds:
-            highest_count_id_preds = 1
-            highest_count_preds = number_of_OPMD
-
-        number_of_PL = (preds[i, :, :] == 2).sum()
-
-        if number_of_PL > highest_count_preds:
-            highest_count_id_preds = 2
-            highest_count_preds = number_of_PL
-
-
-        # Check if prediction is right
-        if highest_count_id_preds == highest_count_id_masks:
-            true_positive_per_image += 1
-
-    
-    return true_positive_per_image
-
-
  
 def val_loop(generator, model, num_classes=4):
     model.eval()
 
     total_loss = 0.0
     total_samples = 0
-
+    #generator_len = len(generator)
 
     conf_matrix = torch.zeros((num_classes, num_classes), dtype=torch.float64).cuda()
     loss_function = training_config['loss_function']
@@ -207,7 +163,7 @@ def val_loop(generator, model, num_classes=4):
     with torch.no_grad():
 
         loop = tqdm(generator, total=len(generator), desc='Validation')
-        tp_total = 0
+
 
         for images, masks in loop:
             images = images.permute(0, 3, 1, 2).cuda(non_blocking=True)
@@ -228,15 +184,12 @@ def val_loop(generator, model, num_classes=4):
             total_loss += loss.item() * batch_size
 
             preds = torch.argmax(outputs, dim=1)
-
-            tp_total += find_true_positive_per_image(preds, masks)
-
             conf_matrix += compute_confusion_matrix(preds, masks, num_classes)
 
     # Final metrics
     metrics = compute_metrics_from_confusion_matrix(conf_matrix)
     metrics["loss"] = total_loss / total_samples
-    print('TP total: ', tp_total)
+
 
     return metrics
 
@@ -284,6 +237,129 @@ def val_loop_conf_matrix(generator, model, num_classes=4):
     return metrics, conf_matrix
 
 
+'''
+def val_loop(generator, model):
+    model.eval()
+    
+    running_metrics = {
+        "loss": 0.0,
+        "accuracy": 0.0,
+        "mIoU": 0.0,
+        "dice": 0.0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "weighted_accuracy": 0.0,
+        "weighted_mIoU": 0.0
+    }
+    
+    total_samples = 0
+    loss_function = training_config['loss_function']
+
+    conf_matrix = torch.zeros((num_classes, num_classes), dtype=torch.float64).cuda()
+
+    with torch.no_grad():
+    for images, masks in generator:
+        images = images.permute(0, 3, 1, 2).cuda()
+        masks = masks.long().cuda()
+
+        outputs = model(images)
+        preds = torch.argmax(outputs, dim=1)
+
+        conf_matrix += compute_confusion_matrix(preds, masks, num_classes)
+
+    with torch.no_grad():
+        loop = tqdm(generator, total=len(generator), desc='Validation')
+
+        for batch_idx, (images, masks) in enumerate(loop):
+            # Move data
+            images = images.permute(0, 3, 1, 2).cuda(non_blocking=True)
+            masks = masks.long().cuda(non_blocking=True)
+
+            batch_size = images.size(0)
+            total_samples += batch_size
+
+            # Forward pass
+            outputs = model(images)
+
+            # Loss (no clone!)
+            loss = criterion(
+                option=loss_function,
+                outputs=outputs,
+                masks=masks
+            )
+
+            # Compute metrics (must return per-batch averages)
+            metrics = compute_metrics(outputs, masks)
+
+            # Accumulate (weighted!)
+            running_metrics["loss"] += loss.item() * batch_size
+
+            for key in running_metrics:
+                if key != "loss":
+                    running_metrics[key] += metrics[key] * batch_size
+
+            # Update progress bar with running averages
+            loop.set_postfix({
+                key: value / total_samples
+                for key, value in running_metrics.items()
+            })
+
+    # Final averages
+    avg_metrics = {
+        key: value / total_samples
+        for key, value in running_metrics.items()
+    }
+
+    return avg_metrics
+'''
+
+'''
+def val_loop(generator, model):
+    model.eval()
+    
+    # Initialize metrics
+    running_metrics = {
+        "loss": 0.0,
+        "accuracy": 0.0,
+        "mIoU": 0.0,
+        "dice": 0.0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "weighted_accuracy": 0.0,
+        "weighted_mIoU": 0.0
+    }
+    
+    loss_function = training_config['loss_function']
+
+    total_batches = len(generator)
+
+    with torch.no_grad():
+        loop = tqdm(enumerate(generator),  total=total_batches, desc='Validation')
+
+        for batch_idx, (images, masks) in loop:
+            masks = masks.long().cuda()
+            images = images.permute(0, 3, 1, 2).cuda()
+            outputs = model(images)
+            loss = criterion(option=loss_function, outputs=outputs.clone(), masks=masks.clone())
+            time.sleep(training_config['delay_per_batch'])
+
+            # Compute and accumulate metrics
+            metrics = compute_metrics(outputs, masks)
+            running_metrics["loss"] += loss.item()
+            for key in running_metrics:
+                if key != "loss":
+                    running_metrics[key] += metrics[key]
+
+             # Update tqdm description and postfix
+            loop.set_description('val_batch {}/{}'.format(batch_idx + 1, total_batches))
+            loop.set_postfix({key: (value / (batch_idx + 1)) for key, value in running_metrics.items()})
+            
+    # Calculate average metrics
+    avg_metrics = {key: value / total_batches for key, value in running_metrics.items()}
+    return avg_metrics
+
+
+'''
 def test_loop(generator, model):
     model.eval()
     
@@ -327,3 +403,55 @@ def test_loop(generator, model):
     # Calculate average metrics
     avg_metrics = {key: value / total_batches for key, value in running_metrics.items()}
     return avg_metrics
+
+
+'''
+def train_loop(generator, optimizer, model):
+    model.train()
+    
+    # Initialize metrics
+    running_metrics = {
+        "loss": 0.0,
+        "accuracy": 0.0,
+        "mIoU": 0.0,
+        "dice": 0.0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "weighted_accuracy": 0.0,
+        "weighted_mIoU": 0.0
+    }
+    
+    total_batches = len(generator)
+    loss_function = training_config['loss_function']
+    
+    loop = tqdm(enumerate(generator), total=total_batches, desc='Training')
+
+    for batch_idx, (images, masks) in loop:
+        torch.cuda.empty_cache()
+        images = images.permute(0, 3, 1, 2).cuda()
+        masks = masks.long().cuda()
+        
+        optimizer.zero_grad()
+        outputs = model(images)
+
+        loss = criterion(option=loss_function, outputs=outputs, masks=masks)
+        loss.backward()
+        optimizer.step()
+        time.sleep(training_config['delay_per_batch'])
+        
+        # Compute and accumulate metrics
+        metrics = compute_metrics(outputs, masks)
+        running_metrics["loss"] += loss.item()
+        for key in running_metrics:
+            if key != "loss":
+                running_metrics[key] += metrics[key]
+
+        # Update tqdm description and postfix
+        loop.set_description('train_batch {}/{}'.format(batch_idx + 1, total_batches))
+        loop.set_postfix({key: (value / (batch_idx + 1)) for key, value in running_metrics.items()})
+        
+    # Calculate average metrics
+    avg_metrics = {key: value / total_batches for key, value in running_metrics.items()}
+
+    return avg_metrics
+'''

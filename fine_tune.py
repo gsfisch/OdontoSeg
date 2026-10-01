@@ -6,29 +6,41 @@ from util.data import get_data_generators
 from util.model import make_model
 from loops import train_loop, val_loop
 from optimizers.main import optimizer
-import wandb
-from datetime import datetime
-from config import training_config, wandb_config, wandb_name, path_models
+#import wandb
+#from config import training_config, wandb_config, wandb_name, path_models
+from fine_tune_config import fine_tune_config, path_models
 from util.scheduler import FlatplusAnneal, FlatplusAnnealTeste
 #from torchinfo import summary
-#import torchseg
-import random
-import numpy as np
+#import numpy as np
+#import random
+import ast
 
 
 def train():
     torch.cuda.empty_cache()
-    experiment_name = training_config['experiment_name']
-    num_epochs = training_config['epochs']
-    epoch_to_unfreeze_encoder = 300
+
+    model_directory_path = fine_tune_config['model_directory_path']
+    configs_file_name = fine_tune_config['configs_file_name']
+    model_file_name = fine_tune_config['model_file_name']
+    num_epochs = fine_tune_config['epochs']
+
+    experiment_name = model_file_name[:-4] + '_fine_tune'
+   
     #device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    torch.manual_seed(1)
-    np.random.seed(1)
-    random.seed(1)
-    torch.cuda.manual_seed(1)
+
+    #torch.manual_seed(1)
+    #np.random.seed(1)
+    #random.seed(1)
+    #torch.cuda.manual_seed(1)
 
 
-    # initialize model
+    # Read training configurations
+    training_config = {}
+    with open(os.path.join(model_directory_path, configs_file_name), 'r') as configs_file:
+        training_config = ast.literal_eval(configs_file.read())
+
+
+    # Initialize and load model
     if training_config['library'] == 'smp':
         model = make_model(training_config['encoder'], training_config['architecture'],
                             training_config['classes'], library='smp',
@@ -41,13 +53,10 @@ def train():
                        decoder_channels=training_config['decoder_channels'], encoder_depth=training_config['encoder_depth'],
                        encoder_params=training_config['encoder_params'], head_upsampling=training_config['head_upsampling'],
                        freeze_encoder=training_config['freeze_encoder'], need_wrapper=training_config['need_wrapper']).cuda()
-    
-
-    #summary(model, input_size=(training_config['batch_size'], 3, 512, 512))
 
     
-    # get data generators
-    training_generator, valid_generator, _ = get_data_generators(seed=1)
+    model.load_state_dict(torch.load(os.path.join(model_directory_path, model_file_name), weights_only="True"))
+    training_generator, valid_generator, _ = get_data_generators(dataset_path=fine_tune_config['dataset_path'], seed=1)
     
     # initialize optimizer and scheduler
     opt = optimizer(
@@ -60,11 +69,11 @@ def train():
     scheduler = FlatplusAnneal(opt, max_iter=training_config['epochs'], step_size=training_config['scheduler_step_size'])
     
     # Initialize WandB
-    wandb.init(
-        project=wandb_name,
-        name=training_config['experiment_name'],
-        config=wandb_config
-    )
+    #wandb.init(
+    #    project=wandb_name,
+    #    name=training_config['experiment_name'],
+    #    config=wandb_config
+    #)
     
     best_model_loss = float('inf')
     best_model_dice = float('-inf')
@@ -89,6 +98,9 @@ def train():
                 for param in model.model.encoder.parameters():
                     param.requires_grad = True
         '''
+
+        for param in model.encoder.parameters():
+            param.requires_grad = False
 
         # Train
         metrics_train = train_loop(training_generator, opt, model)
@@ -120,15 +132,15 @@ def train():
 
             print(f"Saving Checkpoint at epoch: {epoch}")
         
-        metrics_wandb = logging_wandb(metrics_train, metrics_val)
+        #metrics_wandb = logging_wandb(metrics_train, metrics_val)
         
-        wandb.log({
-            **metrics_wandb,
-            'learning_rate': current_lr,
-            'epoch': epoch
-        })
+        #wandb.log({
+        #    **metrics_wandb,
+        #    'learning_rate': current_lr,
+        #    'epoch': epoch
+        #})
 
-    wandb.finish()
+    #wandb.finish()
 
     return
 

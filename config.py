@@ -5,13 +5,14 @@ wandb_name = 'OdontoSeg_Reviewed'
 
 
 training_config = {
-  'experiment_name': 'vit_large_patch16_224_U-Net++_alternative_2',
-  'encoder' : 'vit_large_patch16_224',
-  'architecture': 'U-Net++',
+  'experiment_name': 'caformer_b36_U-Net',
+  'encoder' : 'caformer_b36',
+  'architecture': 'U-Net',
   'epochs': 200,
-  'batch_size': 1,
-  'val_batch_size': 1,
-  'dataset_path' : '/home/fisch/Documents/OdontoSeg/datasets/Dataset_Imagens_Clinicas_V2.0',
+  'batch_size': 3,
+  'val_batch_size': 3,
+  #'dataset_path' : '/home/fisch/Documents/OdontoSeg/datasets/Dataset_Imagens_Clinicas_V2.0',
+  'dataset_path' : '/home/fisch/Documents/OdontoSeg/datasets/dataset_sri_lanka',
   'loss_function' : 'dice',
   'optimizer': 'adamw',
   'scheduler_step_size': 0.8,
@@ -29,7 +30,7 @@ training_config = {
                 'img_size': 512,
                 "scale_factors": (8, 4, 2, 1),
             },
-  'head_upsampling': 1,
+  'head_upsampling': 2,
 }
  
 

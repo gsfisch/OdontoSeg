@@ -23,9 +23,9 @@ models_to_validate = [
     #'resnet34_U-Net', 'SegFormer_mit_b0', 'SegFormer_mit_b1', 'SegFormer_mit_b2', 'SegFormer_mit_b3',
     #'SegFormer_mit_b4', 'SegFormer_mit_b5', 'vgg16_FPN', 'vgg16_Linknet', 'vgg16_U-Net',
     #'vit_large_patch16_224_FPN', 'vit_large_patch16_224_MAnet', 
-    'vit_large_patch16_224_Linknet', 
-    'vit_large_patch16_224_U-Net',
-    #'vit_large_patch16_224_U-Net++', 
+    #'vit_large_patch16_224_Linknet', 
+    #'vit_large_patch16_224_U-Net',
+    'vit_large_patch16_224_U-Net++', 
 ]
 
 

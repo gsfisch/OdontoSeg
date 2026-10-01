@@ -4,12 +4,13 @@ import torch
 
 wandb_name = 'OdontoSeg'
 
-validation_config = {
-  'model_directory_path': 'models/efficientnet-b6_Linknet_alternative_4_fine_tune',
+fine_tune_config = {
+  'model_directory_path': 'models/efficientnet-b6_Linknet',
   'configs_file_name': 'config.txt',
-  'model_file_name': 'efficientnet-b6_Linknet_alternative_4_fine_tune.pth',
-  'dataset_path' : '/home/fisch/Documents/OdontoSeg/datasets/Dataset_Imagens_Clinicas_V2.0',
-  #'dataset_path' : '/home/fisch/Documents/OdontoSeg/datasets/dataset_sri_lanka',
+  'model_file_name': 'efficientnet-b6_Linknet_alternative_4.pth',
+  #'dataset_path' : '/home/fisch/Documents/OdontoSeg/datasets/Dataset_Imagens_Clinicas_V2.0',
+  'dataset_path' : '/home/fisch/Documents/OdontoSeg/datasets/dataset_sri_lanka',
+  'epochs':  200,
 }
  
 path_models = '/home/fisch/Documents/OdontoSeg/models/'
@@ -24,6 +25,7 @@ classes_color = [
   torch.tensor([0, 0, 255])    # background
 ]
 
+'''
 wandb_config ={
   **validation_config,
   'data_augmentation': 'online',
@@ -31,6 +33,7 @@ wandb_config ={
   'val_samples': len(os.listdir(os.path.join(validation_config['dataset_path'], 'validation/images'))),
   'test_samples': len(os.listdir(os.path.join(validation_config['dataset_path'], 'test/images')))
 }
+'''
 
 classes_color_float = [
   torch.FloatTensor([[[255, 0, 0]]]),   # NMM

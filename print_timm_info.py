@@ -2,13 +2,13 @@ import timm
 import torchseg
 
 # Encoders in TorchSeg
-encoders = [x for x in torchseg.list_encoders()]
-print(encoders)
+#encoders = [x for x in torchseg.list_encoders()]
+#print(encoders)
 
 # Models in timm
-all_models = [m for m in timm.list_models()]
+all_models = [m for m in timm.list_models() if 'caformer' in m]
 print(all_models)
 
 # Metadata
-metadata = torchseg.encoders.TIMM_ENCODERS["vit_tiny_patch16_224"]
-print(metadata)
+#metadata = torchseg.encoders.TIMM_ENCODERS["vit_tiny_patch16_224"]
+#print(metadata)

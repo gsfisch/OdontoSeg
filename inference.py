@@ -60,7 +60,7 @@ def fix_colours(masks_image):
 
 
 def main():
-    model_name = 'SegFormer_mit_b3'
+    model_name = 'efficientnet-b6_Linknet'
     model_directory_path = f"models/{model_name}"                         
     '''
     images_path = [  'carcinoma_37', 'carcinoma_31547_2',       
@@ -79,12 +79,12 @@ def main():
     '''
 
     split = 'test'
-    dataset_name = 'dataset_sri_lanka_no_healthy' 
+    dataset_name = 'Dataset_Imagens_Clinicas_V2.0' 
     images_path = f"./datasets/{dataset_name}/{split}/images/"
     inference_directory_path = os.path.join("./inference/", model_directory_path[7:]) #, datetime.now().strftime("%Y-%m-%d_%H:%M:%S.%f")[:-3])
-    inference_directory_path = os.path.join("./inference/dataset_sri_lanka/", model_directory_path[7:]) 
+    inference_directory_path = os.path.join("./inference/", model_directory_path[7:]) 
     configs_file_name = "config.txt"
-    model_file_name = model_directory_path[7:] + ".pth"
+    model_file_name = model_directory_path[7:] + "_alternative_4.pth"
 
 
     # Read training configurations
